@@ -1,0 +1,428 @@
+:host {
+  display: block;
+  min-height: calc(100vh - 4rem);
+}
+
+.login-page {
+  align-items: center;
+  display: flex;
+  gap: 1.25rem;
+  justify-content: center;
+  min-height: calc(100vh - 4rem);
+  padding: 2rem;
+  width: 100%;
+}
+
+.login-showcase {
+  background: linear-gradient(145deg, #0b79dc 0%, #22a7f2 56%, #8be4ff 100%);
+  border-radius: 1.5rem;
+  color: #fff;
+  display: flex;
+  flex: 1 1 28rem;
+  flex-direction: column;
+  gap: 2rem;
+  justify-content: space-between;
+  min-height: 37.5rem;
+  max-width: 29rem;
+  overflow: hidden;
+  padding: 2rem;
+}
+
+.showcase-brand {
+  align-items: center;
+  display: flex;
+  font-size: 1rem;
+  font-weight: 700;
+  gap: 0.75rem;
+}
+
+.brand-mark {
+  align-items: center;
+  background: rgb(255 255 255 / 0.2);
+  border: 1px solid rgb(255 255 255 / 0.32);
+  border-radius: 1rem;
+  display: inline-flex;
+  flex: 0 0 3rem;
+  height: 3rem;
+  justify-content: center;
+  width: 3rem;
+}
+
+.showcase-copy {
+  max-width: 22rem;
+}
+
+.eyebrow {
+  color: rgb(255 255 255 / 0.86);
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  text-transform: uppercase;
+}
+
+.showcase-copy h1 {
+  font-size: 2.35rem;
+  line-height: 1.12;
+  margin: 0 0 1rem;
+}
+
+.showcase-copy p:last-child {
+  color: rgb(255 255 255 / 0.88);
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.ride-path {
+  align-items: center;
+  background: rgb(255 255 255 / 0.14);
+  border: 1px solid rgb(255 255 255 / 0.24);
+  border-radius: 1.25rem;
+  display: flex;
+  gap: 0.85rem;
+  padding: 1rem;
+}
+
+.path-point {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  font-size: 0.75rem;
+  gap: 0.35rem;
+}
+
+.path-point span {
+  border: 2px solid #fff;
+  border-radius: 999px;
+  display: block;
+  height: 0.9rem;
+  width: 0.9rem;
+}
+
+.destination span {
+  background: #fff;
+}
+
+.path-line {
+  border-top: 2px dashed rgb(255 255 255 / 0.7);
+  flex: 1 1 2rem;
+  min-width: 1.5rem;
+}
+
+.path-car {
+  align-items: center;
+  background: #fff;
+  border-radius: 1rem;
+  color: #0b79dc;
+  display: inline-flex;
+  flex: 0 0 3rem;
+  height: 3rem;
+  justify-content: center;
+  width: 3rem;
+}
+
+.showcase-metrics {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.showcase-metrics div {
+  background: rgb(255 255 255 / 0.15);
+  border: 1px solid rgb(255 255 255 / 0.24);
+  border-radius: 1rem;
+  flex: 1 1 0;
+  padding: 1rem;
+}
+
+.showcase-metrics strong {
+  display: block;
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.showcase-metrics span {
+  color: rgb(255 255 255 / 0.82);
+  display: block;
+  font-size: 0.8rem;
+  margin-top: 0.35rem;
+}
+
+.user-form {
+  align-items: stretch;
+  color: #212121;
+  display: flex;
+  flex: 1 1 26rem;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 28rem;
+  min-height: 37.5rem;
+  padding: 1rem 0;
+}
+
+.user-form-header {
+  margin-bottom: 1.75rem;
+  text-align: center;
+}
+
+.form-kicker {
+  color: #0b79dc;
+  font-size: 0.8rem;
+  font-weight: 800;
+  margin: 0 0 0.5rem;
+  text-transform: uppercase;
+}
+
+.user-form-header h2 {
+  color: #101828;
+  font-size: 2.25rem;
+  line-height: 1.15;
+  margin: 0 0 0.5rem;
+}
+
+.user-form-header p:last-child {
+  color: #667085;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.profile-switch {
+  background: #eef7ff;
+  border: 1px solid #d2e9fb;
+  border-radius: 1rem;
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+  padding: 0.35rem;
+}
+
+.profile-option {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 0.8rem;
+  color: #04549b;
+  cursor: pointer;
+  display: inline-flex;
+  flex: 1 1 0;
+  font: inherit;
+  font-weight: 700;
+  gap: 0.5rem;
+  justify-content: center;
+  min-height: 2.85rem;
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.profile-option.is-active {
+  background: #0b79dc;
+  box-shadow: 0 0.75rem 1.5rem rgb(11 121 220 / 0.22);
+  color: #fff;
+}
+
+.accounts-panel {
+  min-height: 18.5rem;
+}
+
+.account-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.account-card {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #dce7f2;
+  border-radius: 1rem;
+  cursor: pointer;
+  display: flex;
+  gap: 0.75rem;
+  min-height: 5rem;
+  padding: 0.8rem;
+  text-align: left;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  width: 100%;
+}
+
+.account-card:hover {
+  border-color: #66c9ff;
+  box-shadow: 0 1rem 2rem rgb(4 84 155 / 0.12);
+  transform: translateY(-1px);
+}
+
+.account-avatar {
+  align-items: center;
+  background: #e8f4ff;
+  border-radius: 0.9rem;
+  color: #0b79dc;
+  display: inline-flex;
+  flex: 0 0 3rem;
+  height: 3rem;
+  justify-content: center;
+  width: 3rem;
+}
+
+.driver-avatar {
+  background: #e8f8f2;
+  color: #00872d;
+}
+
+.account-info {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.account-info strong,
+.account-info small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-info strong {
+  color: #101828;
+  font-size: 0.98rem;
+}
+
+.account-info small {
+  color: #667085;
+  font-size: 0.82rem;
+  margin-top: 0.25rem;
+}
+
+.loading-state {
+  align-items: center;
+  color: #667085;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  justify-content: center;
+  min-height: 18.5rem;
+  padding: 1rem;
+  text-align: center;
+}
+
+.loading-state i {
+  color: #0b79dc;
+  font-size: 1.4rem;
+}
+
+.empty-message {
+  color: #667085;
+  font-size: 0.95rem;
+  margin: 1rem 0 0;
+  text-align: center;
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.form-actions p-button {
+  flex: 1 1 0;
+}
+
+:host ::ng-deep .form-actions .p-button {
+  border-radius: 1rem;
+}
+
+@media (max-width: 1024px) {
+  .login-page {
+    align-items: center;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    padding: 1.25rem;
+  }
+
+  .login-showcase {
+    flex-basis: 24rem;
+    min-height: 33rem;
+    padding: 1.5rem;
+  }
+
+  .user-form {
+    flex-basis: 24rem;
+    min-height: 33rem;
+  }
+
+  .showcase-copy h1 {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .login-page {
+    align-items: stretch;
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: flex-start;
+    min-height: auto;
+  }
+
+  .login-showcase,
+  .user-form {
+    flex: 0 1 auto;
+    max-width: none;
+    min-height: auto;
+    width: 100%;
+  }
+
+  .user-form {
+    padding: 0;
+  }
+
+  .accounts-panel {
+    min-height: auto;
+  }
+
+  .loading-state {
+    min-height: 7rem;
+  }
+}
+
+
+@media (max-width: 480px) {
+  .login-page {
+    padding: 1rem;
+  }
+
+  .login-showcase {
+    border-radius: 1.1rem;
+    gap: 1.5rem;
+    padding: 1.25rem;
+  }
+
+  .showcase-copy h1 {
+    font-size: 1.8rem;
+  }
+
+  .ride-path {
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .path-line {
+    border-left: 2px dashed rgb(255 255 255 / 0.7);
+    border-top: 0;
+    flex: 0 0 1.5rem;
+    min-width: 0;
+  }
+
+  .showcase-metrics,
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .account-card {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .account-card p-tag {
+    margin-left: 3.75rem;
+  }
+}

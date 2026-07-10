@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Arquitetura — Sistema de Corridas</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #f8fafc; }
+  body { display: flex; align-items: center; justify-content: center; }
+  svg { width: 100vw; height: 100vh; max-width: 1800px; }
+  text { font-family: 'Segoe UI', system-ui, sans-serif; fill: #1e293b; }
+  .box { fill: #ffffff; stroke-width: 2.5; rx: 14; }
+  .titulo { font-size: 22px; font-weight: 600; }
+  .sub { font-size: 14px; fill: #64748b; }
+  .rotulo { font-size: 15px; fill: #475569; paint-order: stroke; stroke: #f8fafc; stroke-width: 6px; }
+  .seta { stroke: #475569; stroke-width: 2; fill: none; }
+  .tracejada { stroke-dasharray: 7 6; stroke: #94a3b8; }
+</style>
+</head>
+<body>
+<svg viewBox="0 0 1600 1015" role="img" aria-label="Diagrama de arquitetura do sistema de corridas">
+  <defs>
+    <marker id="ponta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
+    <marker id="ponta-cinza" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <!-- Título -->
+  <text x="50" y="62" style="font-size:30px;font-weight:700">Sistema de Corridas — Arquitetura de Microsserviços</text>
+  <text x="50" y="94" class="sub" style="font-size:17px">Spring Boot · Spring Cloud · Kafka · Redis · WebSocket · Angular</text>
+
+  <g transform="translate(0, 95)">
+  <!-- Setas sólidas -->
+  <line class="seta" x1="320" y1="475" x2="482" y2="475" marker-end="url(#ponta)"/>
+  <text x="352" y="462" class="rotulo">HTTP :8080</text>
+
+  <line class="seta" x1="730" y1="430" x2="852" y2="300" marker-end="url(#ponta)"/>
+  <text x="748" y="348" class="rotulo">/accounts</text>
+
+  <line class="seta" x1="730" y1="520" x2="852" y2="580" marker-end="url(#ponta)"/>
+  <text x="756" y="542" class="rotulo">/rides</text>
+
+  <line class="seta" x1="985" y1="512" x2="985" y2="368" marker-end="url(#ponta)"/>
+  <text x="998" y="445" class="rotulo">Feign · síncrono</text>
+
+  <line class="seta" x1="1110" y1="545" x2="1282" y2="295" marker-end="url(#ponta)"/>
+  <text x="1206" y="408" class="rotulo">JPA</text>
+
+  <line class="seta" x1="1110" y1="280" x2="1282" y2="255" marker-end="url(#ponta)"/>
+  <text x="1182" y="252" class="rotulo">JPA</text>
+
+  <line class="seta" x1="1110" y1="585" x2="1282" y2="470" marker-end="url(#ponta)"/>
+  <text x="1148" y="560" class="rotulo">evento de corrida</text>
+
+  <line class="seta" x1="1110" y1="640" x2="1282" y2="680" marker-end="url(#ponta)"/>
+  <text x="1140" y="682" class="rotulo">status · TTL 24h</text>
+
+  <!-- WebSocket (tempo real) -->
+  <path class="seta" d="M 985 672 C 985 862, 185 862, 185 566" marker-end="url(#ponta)"/>
+  <text x="430" y="838" class="rotulo" style="font-size:16px">WebSocket — notificações em tempo real</text>
+
+  <!-- Tracejadas: descoberta / registro / configuração -->
+  <line class="seta tracejada" x1="685" y1="390" x2="845" y2="132" marker-end="url(#ponta-cinza)"/>
+  <text x="740" y="268" class="rotulo">descoberta</text>
+
+  <line class="seta tracejada" x1="960" y1="230" x2="945" y2="132" marker-end="url(#ponta-cinza)"/>
+  <text x="968" y="188" class="rotulo">registro</text>
+
+  <path class="seta tracejada" d="M 860 555 L 795 555 L 795 85 L 822 85" marker-end="url(#ponta-cinza)"/>
+
+  <line class="seta tracejada" x1="610" y1="130" x2="610" y2="382" marker-end="url(#ponta-cinza)"/>
+  <text x="620" y="262" class="rotulo">configurações</text>
+
+  <!-- Caixas de suporte -->
+  <rect class="box" x="500" y="40" width="220" height="90" rx="14" stroke="#64748b"/>
+  <text x="610" y="78" text-anchor="middle" class="titulo" style="font-size:20px">Config Server</text>
+  <text x="610" y="104" text-anchor="middle" class="sub">:8888 · configuração central</text>
+
+  <rect class="box" x="830" y="40" width="240" height="90" rx="14" stroke="#64748b"/>
+  <text x="950" y="78" text-anchor="middle" class="titulo" style="font-size:20px">Eureka Server</text>
+  <text x="950" y="104" text-anchor="middle" class="sub">:8761 · service discovery</text>
+
+  <!-- Frontend -->
+  <rect class="box" x="50" y="390" width="270" height="170" rx="14" stroke="#2563eb"/>
+  <text x="185" y="440" text-anchor="middle" class="titulo">Frontend Angular</text>
+  <text x="185" y="470" text-anchor="middle" class="sub">PrimeNG · signals · OnPush</text>
+  <text x="185" y="494" text-anchor="middle" class="sub">core / features / shared</text>
+  <text x="185" y="518" text-anchor="middle" class="sub">guards por perfil</text>
+
+  <!-- Gateway -->
+  <rect class="box" x="490" y="390" width="240" height="170" rx="14" stroke="#7c3aed"/>
+  <text x="610" y="448" text-anchor="middle" class="titulo">API Gateway</text>
+  <text x="610" y="478" text-anchor="middle" class="sub">:8080</text>
+  <text x="610" y="502" text-anchor="middle" class="sub">único ponto de entrada</text>
+
+  <!-- Serviços -->
+  <rect class="box" x="860" y="230" width="250" height="130" rx="14" stroke="#059669"/>
+  <text x="985" y="278" text-anchor="middle" class="titulo">Account Service</text>
+  <text x="985" y="306" text-anchor="middle" class="sub">contas: cliente / motorista</text>
+
+  <rect class="box" x="860" y="520" width="250" height="150" rx="14" stroke="#059669"/>
+  <text x="985" y="568" text-anchor="middle" class="titulo">Ride Service</text>
+  <text x="985" y="596" text-anchor="middle" class="sub">domínio de corridas</text>
+  <text x="985" y="620" text-anchor="middle" class="sub">Clean Architecture</text>
+  <text x="985" y="644" text-anchor="middle" class="sub">producer / consumer / timeout</text>
+
+  <!-- Infra -->
+  <rect class="box" x="1290" y="200" width="250" height="100" rx="14" stroke="#d97706"/>
+  <text x="1415" y="242" text-anchor="middle" class="titulo" style="font-size:20px">PostgreSQL</text>
+  <text x="1415" y="270" text-anchor="middle" class="sub">persistência · fonte da verdade</text>
+
+  <rect class="box" x="1290" y="420" width="250" height="100" rx="14" stroke="#d97706"/>
+  <text x="1415" y="462" text-anchor="middle" class="titulo" style="font-size:20px">Kafka</text>
+  <text x="1415" y="490" text-anchor="middle" class="sub">log de eventos durável</text>
+
+  <rect class="box" x="1290" y="640" width="250" height="100" rx="14" stroke="#d97706"/>
+  <text x="1415" y="682" text-anchor="middle" class="titulo" style="font-size:20px">Redis</text>
+  <text x="1415" y="710" text-anchor="middle" class="sub">cache de status · TTL 24h</text>
+
+  <!-- Legenda -->
+  <g>
+    <line class="seta" x1="1150" y1="812" x2="1210" y2="812" marker-end="url(#ponta)"/>
+    <text x="1222" y="817" class="sub" style="font-size:15px">chamada síncrona (HTTP / Feign)</text>
+    <line class="seta tracejada" x1="1150" y1="847" x2="1210" y2="847" marker-end="url(#ponta-cinza)"/>
+    <text x="1222" y="852" class="sub" style="font-size:15px">registro · descoberta · configuração</text>
+    <path class="seta" d="M 1150 882 C 1170 872, 1190 892, 1210 882" marker-end="url(#ponta)"/>
+    <text x="1222" y="887" class="sub" style="font-size:15px">assíncrono / tempo real</text>
+  </g>
+  </g>
+</svg>
+</body>
+</html>

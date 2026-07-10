@@ -1,0 +1,200 @@
+<div class="rides-page">
+  <app-page-header title="Minhas corridas" [subtitle]="account()?.name ?? null">
+    <div class="header-actions">
+      <p-button
+        label="Atualizar"
+        icon="pi pi-refresh"
+        severity="secondary"
+        [outlined]="true"
+        [loading]="loading()"
+        (onClick)="loadRides()"
+      />
+      <p-button label="Nova corrida" icon="pi pi-plus" (onClick)="openCreateDialog()" />
+    </div>
+  </app-page-header>
+
+  <div class="rides-table-wrap">
+    <p-table
+      [value]="myRides()"
+      [loading]="loading()"
+      [tableStyle]="{ 'min-width': '60rem' }"
+      class="p-datatable-sm app-table"
+      [rowTrackBy]="trackById"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Corrida</th>
+          <th>Origem</th>
+          <th>Destino</th>
+          <th>Status</th>
+          <th>Motorista</th>
+          <th>Criada em</th>
+          <th class="actions-header">Ações</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-ride>
+        <tr [class.editing-tr]="editingRideId() === ride.id">
+          <td class="id-cell">{{ shortId(ride.id) }}</td>
+          <td>{{ ride.startAddress }}</td>
+          <td>{{ ride.destinationAddress }}</td>
+          <td>
+            <app-ride-status-tag [status]="ride.status" perspective="client" />
+          </td>
+          <td>{{ driverLabel(ride.driverId) }}</td>
+          <td>{{ ride.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+          <td class="actions-cell">
+            @if (canEditRide(ride)) {
+              <p-button
+                icon="pi pi-pencil"
+                severity="secondary"
+                ariaLabel="Editar corrida"
+                title="Editar"
+                [text]="true"
+                [rounded]="true"
+                [disabled]="savingRideId() === ride.id"
+                (onClick)="startEditingRide(ride)"
+              />
+            } @else {
+              <span class="no-action">Finalizada</span>
+            }
+          </td>
+        </tr>
+        @if (editingRideId() === ride.id) {
+          <tr class="expanded-edit-tr">
+            <td colspan="7">
+              <div class="expanded-edit-row-inside" [formGroup]="editForm">
+                <div class="edit-fields">
+                  <label class="edit-label" [for]="'edit-start-' + ride.id">
+                    <span>Origem</span>
+                    <input
+                      [id]="'edit-start-' + ride.id"
+                      type="text"
+                      pInputText
+                      formControlName="startAddress"
+                      class="edit-input"
+                      placeholder="Origem da corrida"
+                    />
+                  </label>
+                  <div class="field-validation">
+                    @if (editForm.controls.startAddress.touched && editForm.controls.startAddress.errors) {
+                      <small class="p-error">Informe a origem.</small>
+                    }
+                  </div>
+                </div>
+                <div class="edit-fields">
+                  <label class="edit-label" [for]="'edit-destination-' + ride.id">
+                    <span>Destino</span>
+                    <input
+                      [id]="'edit-destination-' + ride.id"
+                      type="text"
+                      pInputText
+                      formControlName="destinationAddress"
+                      class="edit-input"
+                      placeholder="Destino da corrida"
+                    />
+                  </label>
+                  <div class="field-validation">
+                    @if (
+                      editForm.controls.destinationAddress.touched &&
+                      editForm.controls.destinationAddress.errors
+                    ) {
+                      <small class="p-error">Informe o destino.</small>
+                    }
+                  </div>
+                </div>
+                <div class="expanded-edit-row-inside expanded-actions-row">
+                  <p-button
+                    label="Confirmar"
+                    icon="pi pi-check"
+                    [loading]="savingRideId() === ride.id"
+                    [disabled]="editForm.invalid"
+                    (onClick)="saveEditingRide(ride)"
+                  />
+                  <p-button
+                    label="Cancelar"
+                    severity="secondary"
+                    [outlined]="true"
+                    [disabled]="savingRideId() === ride.id"
+                    (onClick)="cancelEditingRide()"
+                  />
+                </div>
+              </div>
+            </td>
+          </tr>
+        }
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7" class="empty-message">Nenhuma corrida encontrada.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <p-dialog
+    header="Nova corrida"
+    [visible]="createDialogVisible()"
+    [modal]="true"
+    [closable]="true"
+    [draggable]="false"
+    [resizable]="false"
+    (onHide)="closeCreateDialog()"
+    class="ride-dialog"
+    [contentStyle]="{ 'min-width': '24rem' }"
+  >
+    <form [formGroup]="createForm" (ngSubmit)="submitCreate()">
+      <div class="field">
+        <label for="start-address">Origem</label>
+        <input
+          id="start-address"
+          type="text"
+          pInputText
+          formControlName="startAddress"
+          placeholder="Ex: Av. Washington Soares, 1321"
+          class="w-full"
+        />
+        <div class="field-validation">
+          @if (createForm.controls.startAddress.touched && createForm.controls.startAddress.errors) {
+            <small class="p-error block mt-1">Informe a origem.</small>
+          }
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="destination-address">Destino</label>
+        <input
+          id="destination-address"
+          type="text"
+          pInputText
+          formControlName="destinationAddress"
+          placeholder="Ex: Praia de Iracema"
+          class="w-full"
+        />
+        <div class="field-validation">
+          @if (
+            createForm.controls.destinationAddress.touched &&
+            createForm.controls.destinationAddress.errors
+          ) {
+            <small class="p-error block mt-1">Informe o destino.</small>
+          }
+        </div>
+      </div>
+    </form>
+
+    <ng-template pTemplate="footer">
+      <p-button
+        label="Cancelar"
+        severity="secondary"
+        (onClick)="closeCreateDialog()"
+        [disabled]="creating()"
+      />
+      <p-button
+        label="Criar"
+        icon="pi pi-send"
+        (onClick)="submitCreate()"
+        [loading]="creating()"
+        [disabled]="createForm.invalid"
+      />
+    </ng-template>
+  </p-dialog>
+</div>

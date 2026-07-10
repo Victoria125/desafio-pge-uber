@@ -1,0 +1,44 @@
+server:
+  port: 8082
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/ride_db
+    username: rideapp
+    password: rideapp123
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  kafka:
+    producer:
+      bootstrap-servers: localhost:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.type.mapping: rideCreatedMessage:com.vitoria.rideservice.application.usecase.ride.create.RideCreatedMessage
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: rideNotificationGroup
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: '*'
+        spring.json.type.mapping: rideCreatedMessage:com.vitoria.rideservice.application.usecase.ride.create.RideCreatedMessage
+
+ride:
+  timeout:
+    seconds: 120
+    check-interval-ms: 30000

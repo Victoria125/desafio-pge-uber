@@ -1,0 +1,146 @@
+.rides-page {
+  padding: 1rem;
+}
+
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.rides-table-wrap {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.id-cell {
+  color: #495057;
+  font-family: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace;
+}
+
+.actions-header,
+.actions-cell {
+  text-align: center;
+  width: 6rem;
+}
+
+.no-action {
+  color: #6c757d;
+  display: inline-flex;
+  font-size: 0.875rem;
+  justify-content: center;
+  width: 100%;
+}
+
+.editing-tr td {
+  background: #f8fbff;
+  border-bottom-color: transparent;
+}
+
+.expanded-edit-tr td {
+  background: #f8fbff;
+  border-top: 0;
+  padding: 0.75rem 1rem 1rem;
+}
+
+.expanded-edit-row-inside {
+  align-items: flex-end;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  width: 100%;
+}
+
+.expanded-edit-row-inside.expanded-actions-row {
+  flex: 0 0 auto;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  width: auto;
+}
+
+.edit-fields {
+  display: flex;
+  flex: 1 1 16rem;
+  flex-direction: column;
+  gap: 0.375rem;
+  min-width: 0;
+}
+
+.edit-label {
+  color: #1f4f7a;
+  display: flex;
+  flex-direction: column;
+  font-size: 0.875rem;
+  font-weight: 500;
+  gap: 0.375rem;
+  line-height: 1.25;
+  width: 100%;
+}
+
+.edit-label > span {
+  display: block;
+}
+
+.edit-input {
+  background: #fff;
+  border-radius: 8px;
+  box-sizing: border-box;
+  height: 2.35rem;
+  max-width: 100%;
+  width: 100%;
+}
+
+.field-validation {
+  min-height: 1.25rem;
+}
+
+.ride-dialog .field {
+  margin-bottom: 1rem;
+}
+
+.ride-dialog .field label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.ride-dialog .field-validation {
+  min-height: 1.5rem;
+}
+
+.ride-dialog .w-full {
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .rides-page {
+    padding: 0.75rem;
+  }
+
+  .expanded-edit-row-inside {
+    align-items: stretch;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .expanded-edit-row-inside.expanded-actions-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    width: 100%;
+  }
+}
+
+@media (max-width: 720px) {
+  .header-actions {
+    justify-content: flex-start;
+  }
+
+  .expanded-edit-tr td {
+    padding: 0.75rem;
+  }
+}

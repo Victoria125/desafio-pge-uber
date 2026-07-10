@@ -1,0 +1,389 @@
+
+
+
+@import './theme/colors.css';
+
+
+@import 'primeicons/primeicons.css';
+
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Helvetica, Arial, sans-serif;
+  color: var(--cinza-900);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+
+.app-table.p-datatable .p-datatable-table-container {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  background: #fff;
+  border: 1px solid var(--cinza-300, #e9ecef);
+}
+
+.app-table.p-datatable .p-datatable-thead > tr > th {
+  background: #f8f9fa;
+  color: #212121 !important;
+  font-weight: 600;
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid var(--cinza-300, #e9ecef);
+  font-size: 0.875rem;
+}
+
+.app-table.p-datatable .p-datatable-tbody > tr > td {
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid #f1f3f5;
+  background: #fff;
+  color: #212121 !important;
+  font-size: 0.875rem;
+}
+
+.app-table.p-datatable .p-datatable-tbody > tr:hover > td {
+  background: #f8fafc;
+  color: #212121 !important;
+}
+
+
+.app-table.p-datatable .p-datatable-tbody > tr > td.empty-message {
+  color: #616161 !important;
+}
+
+.app-table.p-datatable .p-datatable-tbody > tr:last-child > td {
+  border-bottom: none;
+}
+
+
+.table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+
+.page-header {
+  color: #212121;
+}
+
+.page-header h1 {
+  color: #212121;
+  font-weight: 600;
+}
+
+.page-header .student-course-info,
+.page-header .matrix-id,
+.page-header .invalid-id {
+  color: #616161;
+  font-size: 0.875rem;
+}
+
+
+.filter-panel {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  margin-bottom: 1.5rem;
+}
+
+.filter-panel .filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
+.filter-panel .filter-row .field label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #212121;
+}
+
+.filter-panel .filter-row .field.actions {
+  margin-left: auto;
+}
+
+.filter-panel .filter-row .checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filter-panel .filter-row .checkbox-field label {
+  margin-bottom: 0;
+  cursor: pointer;
+  color: #212121;
+  font-size: 0.875rem;
+}
+.account-create-dialog.p-dialog {
+  backdrop-filter: blur(16.85px);
+  background: rgb(255 255 255 / 87%);
+  height: 500px;
+  border: 0;
+  border-radius: 60px;
+  box-shadow: 0 4px 32px 0 rgb(0 0 0 / 10%);
+  color: #04549b;
+  max-width: 94vw;
+  overflow: visible;
+  width: 545px;
+}
+
+.account-create-dialog .p-dialog-header {
+  background: transparent;
+  border: 0;
+  border-radius: 60px 60px 0 0;
+  color: #04549b;
+  padding: 34px 48px 0;
+}
+
+.account-create-dialog .p-dialog-title {
+  color: #04549b;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 22px;
+}
+
+.account-create-dialog .p-dialog-header-icon {
+  color: #04549b;
+  height: 34px;
+  width: 34px;
+}
+
+.account-create-dialog .p-dialog-content {
+  background: transparent;
+  color: #04549b;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: visible;
+  padding: 28px 58px 40px;
+}
+
+.account-create-dialog .p-dialog-footer {
+  background: transparent;
+  border: 0;
+  border-radius: 0 0 60px 60px;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding: 18px 58px 40px;
+}
+
+.account-create-dialog form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin: 0 auto;
+  max-width: 100%;
+  width: 428px;
+}
+.account-create-dialog .account-dialog-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin: 18px auto 0;
+  max-width: 100%;
+  width: 428px;
+}
+
+.account-create-dialog .field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  overflow: visible;
+  width: 100%;
+}
+
+.account-create-dialog .field label {
+  color: #04549b;
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  font-weight: 400;
+  gap: 8px;
+  line-height: 17px;
+  margin: 0;
+}
+
+.account-create-dialog .field-validation {
+  min-height: 0;
+}
+
+.account-create-dialog .p-inputtext,
+.account-create-dialog .p-select {
+  background: #fff;
+  border: 1px solid rgb(0 0 0 / 25%);
+  border-radius: 10px;
+  box-sizing: border-box;
+  color: #04549b;
+  font-size: 14px;
+  height: 36px;
+  outline: none;
+  width: 100%;
+}
+
+.account-create-dialog .p-inputtext {
+  padding: 0 10px;
+}
+
+.account-create-dialog .p-inputtext::placeholder {
+  color: #d4d4d4;
+}
+
+.account-create-dialog .p-select-label {
+  align-items: center;
+  color: #04549b;
+  display: flex;
+  font-size: 14px;
+  font-weight: 400;
+  height: 34px;
+  padding: 0 10px;
+}
+
+.account-create-dialog .p-select-dropdown {
+  color: #04549b;
+  width: 38px;
+}
+
+.account-create-dialog .p-select-dropdown-icon {
+  display: none;
+}
+
+.account-create-dialog .p-select-dropdown::before {
+  background: #22a7f2;
+  clip-path: polygon(50% 100%, 0 0, 100% 0);
+  content: '';
+  display: block;
+  height: 8px;
+  transform: matrix(1, 0, 0, -1, 0, 0);
+  width: 12px;
+}
+
+.account-create-dialog .p-select.p-select-open {
+  background-color: #f8fbff;
+  border: 2px solid #0b79dc;
+  border-bottom: 2px solid transparent;
+  border-radius: 10px 10px 0 0;
+  box-shadow: -2px 0 6px rgb(11 121 220 / 20%), 2px 0 6px rgb(11 121 220 / 20%), 0 -2px 6px rgb(11 121 220 / 20%);
+}
+
+.account-create-dialog .p-select.p-select-open .p-select-dropdown::before {
+  transform: matrix(1, 0, 0, 1, 0, 0);
+}
+
+.account-create-dialog .p-button {
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 300;
+  height: 34px;
+  line-height: 19px;
+  min-width: 120px;
+}
+
+.account-create-dialog .p-button:not(.p-button-secondary) {
+  background: #0b79dc;
+  border: 1px solid #0b79dc;
+  box-shadow: 0 4px 17px -2px rgb(0 0 0 / 50%);
+  color: #fff;
+}
+
+.account-create-dialog .p-button:not(.p-button-secondary):hover {
+  background: #04549b;
+  border-color: #04549b;
+  box-shadow: 0 8px 24px -2px rgb(0 0 0 / 15%);
+}
+
+.account-create-dialog .p-button-secondary {
+  background: transparent;
+  border: 1px solid #0b79dc;
+  color: #0b79dc;
+}
+
+.account-create-dialog .p-button-secondary:hover {
+  background: rgb(11 121 220 / 10%);
+  border-color: #04549b;
+  color: #04549b;
+}
+
+.account-type-panel.p-select-overlay {
+  background: #f8fbff;
+  border: 2px solid #0b79dc;
+  border-radius: 0 0 10px 10px;
+  border-top: 0;
+  box-shadow: -2px 0 6px rgb(11 121 220 / 20%), 2px 0 6px rgb(11 121 220 / 20%), 0 4px 6px rgb(11 121 220 / 20%);
+  margin-top: -2px;
+  overflow: hidden;
+}
+
+.account-type-panel .p-select-list {
+  padding: 0;
+}
+
+.account-type-panel .p-select-option {
+  align-items: center;
+  color: #04549b;
+  display: flex;
+  font-size: 14px;
+  height: 36px;
+  padding: 0 10px;
+}
+
+.account-type-panel .p-select-option:hover,
+.account-type-panel .p-select-option.p-select-option-selected {
+  background: rgb(11 121 220 / 12%);
+  color: #04549b;
+}
+
+.account-type-panel .p-select-option.p-select-option-selected {
+  font-weight: 600;
+}
+
+@media (max-width: 560px) {
+  .account-create-dialog.p-dialog {
+    border-radius: 24px;
+    width: 94vw;
+  }
+
+  .account-create-dialog .p-dialog-header {
+    border-radius: 24px 24px 0 0;
+    padding: 24px 24px 0;
+  }
+
+  .account-create-dialog .p-dialog-content {
+    padding: 20px 24px 28px;
+  }
+
+  .account-create-dialog .p-dialog-footer {
+    border-radius: 0 0 24px 24px;
+    flex-wrap: wrap;
+    padding: 16px 24px 28px;
+  }
+
+  .account-create-dialog form,
+  .account-create-dialog .account-dialog-actions {
+    gap: 12px;
+    width: 100%;
+  }
+
+  .account-create-dialog .account-dialog-actions {
+    flex-wrap: wrap;
+  }
+}
