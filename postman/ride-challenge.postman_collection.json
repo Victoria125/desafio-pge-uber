@@ -1,0 +1,244 @@
+{
+  "info": {
+    "name": "Ride Challenge - API Gateway",
+    "description": "Fluxo completo do desafio de corridas via API Gateway (porta 8080).\n\nOrdem sugerida de execucao:\n1. Accounts > Criar conta (cliente)\n2. Accounts > Criar conta (motorista)\n3. Rides > Criar corrida\n4. Rides > Consultar status\n5. Rides > Aceitar corrida (motorista)\n6. Rides > Consultar status (agora IN_PROGRESS, vindo do Redis)\n\nOs IDs retornados sao salvos automaticamente nas variaveis da collection (clientId, driverId, rideId).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "clientId", "value": "" },
+    { "key": "driverId", "value": "" },
+    { "key": "rideId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Accounts",
+      "item": [
+        {
+          "name": "Criar conta (cliente)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201 Created', () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "pm.test('Retorna o id da conta', () => pm.expect(json.id).to.be.a('string'));",
+                  "pm.collectionVariables.set('clientId', json.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/accounts",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Maria Silva\",\n  \"email\": \"maria@email.com\",\n  \"type\": \"CLIENT\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Criar conta (motorista)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201 Created', () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('driverId', json.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/accounts",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Joao Souza\",\n  \"email\": \"joao@email.com\",\n  \"type\": \"DRIVER\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Listar contas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Retorna uma lista', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/accounts"
+          }
+        },
+        {
+          "name": "Buscar conta por id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/accounts/{{clientId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rides",
+      "item": [
+        {
+          "name": "Criar corrida",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201 Created', () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "pm.test('Retorna o id da corrida', () => pm.expect(json.id).to.be.a('string'));",
+                  "pm.collectionVariables.set('rideId', json.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/rides",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{clientId}}\",\n  \"startAddress\": \"Av. Santos Dumont, 1000 - Fortaleza\",\n  \"destinationAddress\": \"Av. Beira Mar, 500 - Fortaleza\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Listar corridas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Retorna uma lista', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/rides"
+          }
+        },
+        {
+          "name": "Buscar corrida por id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/rides/{{rideId}}"
+          }
+        },
+        {
+          "name": "Consultar status da corrida",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.test('Retorna o status', () => pm.expect(json.status).to.be.a('string'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/rides/{{rideId}}/status"
+          }
+        },
+        {
+          "name": "Aceitar corrida (motorista)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.test('Corrida em andamento', () => pm.expect(json.status).to.eql('IN_PROGRESS'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/rides/{{rideId}}/accept",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"driverId\": \"{{driverId}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Atualizar corrida",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/rides/{{rideId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{clientId}}\",\n  \"startAddress\": \"Av. Santos Dumont, 1200 - Fortaleza\",\n  \"destinationAddress\": \"Av. Beira Mar, 900 - Fortaleza\"\n}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

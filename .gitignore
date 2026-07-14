@@ -10,5 +10,7 @@ build/
 *.log
 .angular/
 **/.angular/
-.angular/
-**/.angular/
+
+**/cypress/videos/
+**/cypress/screenshots/
+**/cypress/downloads/
