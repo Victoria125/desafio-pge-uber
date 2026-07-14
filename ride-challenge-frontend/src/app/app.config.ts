@@ -8,6 +8,7 @@ import Aura from '@primeuix/themes/aura';
 import { environment } from '../environments/environment';
 import { API_BASE_URL } from './core/api/api-base-url.token';
 import { errorInterceptor } from './core/errors/error.interceptor';
+import { authInterceptor } from './core/session/auth.interceptor';
 import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
@@ -15,7 +16,7 @@ export const appConfig: ApplicationConfig = {
     { provide: API_BASE_URL, useValue: environment.apiUrl },
     MessageService,
     provideBrowserGlobalErrorListeners(),
-    provideHttpClient(withInterceptors([errorInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor, errorInterceptor])),
     provideRouter(routes),
     providePrimeNG({
       theme: {

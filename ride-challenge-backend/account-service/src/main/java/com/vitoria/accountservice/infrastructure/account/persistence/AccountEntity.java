@@ -16,8 +16,11 @@ public class AccountEntity {
     @Column(name = "account_name", nullable = false)
     private String name;
 
-    @Column(name = "account_email", nullable = false)
+    @Column(name = "account_email", nullable = false, unique = true)
     private String email;
+
+    @Column(name = "account_password_hash", nullable = false)
+    private String passwordHash;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "account_type", nullable = false)
@@ -31,6 +34,7 @@ public class AccountEntity {
                 anAccount.getId(),
                 anAccount.getName(),
                 anAccount.getEmail(),
+                anAccount.getPasswordHash(),
                 anAccount.getType(),
                 anAccount.getCreatedAt()
         );
@@ -41,6 +45,7 @@ public class AccountEntity {
                 anEntity.getId(),
                 anEntity.getName(),
                 anEntity.getEmail(),
+                anEntity.getPasswordHash(),
                 anEntity.getType(),
                 anEntity.getCreatedAt()
         );
@@ -50,12 +55,14 @@ public class AccountEntity {
             final String id,
             final String name,
             final String email,
+            final String passwordHash,
             final AccountType type,
             final Instant createdAt
     ) {
         this.id = id;
         this.name = name;
         this.email = email;
+        this.passwordHash = passwordHash;
         this.type = type;
         this.createdAt = createdAt;
     }
@@ -85,6 +92,14 @@ public class AccountEntity {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
     }
 
     public AccountType getType() {

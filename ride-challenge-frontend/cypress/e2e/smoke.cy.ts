@@ -1,11 +1,15 @@
-const contas = [
-  { id: 'c1', name: 'Maria Silva', email: 'maria@email.com', type: 'CLIENT' },
-  { id: 'd1', name: 'Joao Souza', email: 'joao@email.com', type: 'DRIVER' },
-];
+const loginResponse = {
+  token: 'jwt-token',
+  expiresIn: 86400,
+  accountId: 'c1',
+  name: 'Maria Silva',
+  email: 'maria@email.com',
+  type: 'CLIENT',
+};
 
 describe('Smoke - fluxo de entrada', () => {
   beforeEach(() => {
-    cy.intercept('GET', '**/accounts', { body: contas }).as('listAccounts');
+    cy.intercept('POST', '**/auth/login', { body: loginResponse }).as('login');
     cy.intercept('GET', '**/rides', { body: [] }).as('listRides');
   });
 
@@ -14,24 +18,23 @@ describe('Smoke - fluxo de entrada', () => {
     cy.url().should('include', '/login');
   });
 
-  it('renderiza a tela de login e filtra contas por perfil', () => {
+  it('renderiza a tela de login com email, senha e cadastro', () => {
     cy.visit('/login');
-    cy.wait('@listAccounts');
 
     cy.contains('Desafio de Corridas').should('be.visible');
-    cy.contains('.account-card', 'Maria Silva').should('be.visible');
-
-    cy.contains('button', 'Motorista').click();
-    cy.contains('.account-card', 'Joao Souza').should('be.visible');
-    cy.contains('.account-card', 'Maria Silva').should('not.exist');
+    cy.get('#login-email').should('be.visible');
+    cy.get('#login-password').should('be.visible');
+    cy.contains('button', 'Criar conta').should('be.visible');
   });
 
   it('entra como cliente e chega na tela de corridas', () => {
     cy.visit('/login');
-    cy.wait('@listAccounts');
 
-    cy.contains('.account-card', 'Maria Silva').click();
+    cy.get('#login-email').type('maria@email.com');
+    cy.get('#login-password').type('secret123');
+    cy.contains('button', 'Entrar').click();
 
+    cy.wait('@login');
     cy.url().should('include', '/client/rides');
     cy.wait('@listRides');
   });

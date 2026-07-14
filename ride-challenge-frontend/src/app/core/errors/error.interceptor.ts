@@ -1,9 +1,11 @@
 import { inject } from '@angular/core';
 import type { HttpInterceptorFn } from '@angular/common/http';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { MessageService } from 'primeng/api';
 import type { ApiErrorResponseDto } from '../api/api-dtos';
+import { SessionService } from '../session/session.service';
 import { getMessageForHttpError } from './error-messages';
 
 
@@ -12,6 +14,8 @@ import { getMessageForHttpError } from './error-messages';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const messageService = inject(MessageService);
+  const router = inject(Router);
+  const session = inject(SessionService);
 
   return next(req).pipe(
     catchError((err: unknown) => {
@@ -28,6 +32,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         summary: 'Erro',
         detail,
       });
+
+      if (httpErr.status === 401) {
+        session.logout();
+        router.navigate(['/login']);
+      }
 
       return throwError(() => err);
     })

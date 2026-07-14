@@ -10,5 +10,7 @@ public interface AccountGateway {
 
     Optional<Account> getById(String anId);
 
+    Optional<Account> getByEmail(String anEmail);
+
     List<Account> getAll();
 }

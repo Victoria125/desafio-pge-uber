@@ -10,11 +10,26 @@ export interface AccountDto {
 export interface CreateAccountRequestDto {
   name: string;
   email: string;
+  password: string;
   type: AccountType;
 }
 
 export interface CreateAccountResponseDto {
   id: string;
+}
+
+export interface LoginRequestDto {
+  email: string;
+  password: string;
+}
+
+export interface LoginResponseDto {
+  token: string;
+  expiresIn: number;
+  accountId: string;
+  name: string;
+  email: string;
+  type: AccountType;
 }
 
 export type RideStatus = 'CREATED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';

@@ -48,7 +48,7 @@ class AccountPostgresGatewayIT {
     @Test
     void givenAValidAccount_whenCallsSave_thenPersistsOnPostgres() {
 
-        final Account anAccount = Account.newAccount("Maria Silva", "maria@email.com", AccountType.CLIENT);
+        final Account anAccount = Account.newAccount("Maria Silva", "maria@email.com", "hashed-password", AccountType.CLIENT);
 
         final String anId = this.accountGateway.save(anAccount);
 
@@ -59,7 +59,7 @@ class AccountPostgresGatewayIT {
     @Test
     void givenAPersistedAccount_whenCallsGetById_thenReturnsAccount() {
 
-        final Account anAccount = Account.newAccount("Joao Souza", "joao@email.com", AccountType.DRIVER);
+        final Account anAccount = Account.newAccount("Joao Souza", "joao@email.com", "hashed-password", AccountType.DRIVER);
         this.accountGateway.save(anAccount);
 
         final Optional<Account> actual = this.accountGateway.getById(anAccount.getId());
@@ -82,8 +82,8 @@ class AccountPostgresGatewayIT {
     @Test
     void givenPersistedAccounts_whenCallsGetAll_thenReturnsAll() {
 
-        this.accountGateway.save(Account.newAccount("Maria Silva", "maria@email.com", AccountType.CLIENT));
-        this.accountGateway.save(Account.newAccount("Joao Souza", "joao@email.com", AccountType.DRIVER));
+        this.accountGateway.save(Account.newAccount("Maria Silva", "maria@email.com", "hashed-password", AccountType.CLIENT));
+        this.accountGateway.save(Account.newAccount("Joao Souza", "joao@email.com", "hashed-password", AccountType.DRIVER));
 
         final List<Account> actual = this.accountGateway.getAll();
 

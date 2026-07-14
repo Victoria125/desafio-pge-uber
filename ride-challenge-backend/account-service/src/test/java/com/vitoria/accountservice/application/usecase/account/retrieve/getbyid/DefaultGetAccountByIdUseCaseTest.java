@@ -27,7 +27,7 @@ class DefaultGetAccountByIdUseCaseTest {
     void givenAValidId_whenCallsGetAccountById_thenReturnAccount() {
         
         final Account anAccount =
-                Account.newAccount("Joao Motorista", "joao@email.com", AccountType.DRIVER);
+                Account.newAccount("Joao Motorista", "joao@email.com", "hashed-password", AccountType.DRIVER);
         final String expectedId = anAccount.getId();
 
         

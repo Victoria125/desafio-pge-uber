@@ -8,7 +8,7 @@ import { SessionService } from './session.service';
 
 export const sessionGuard: CanActivateFn = (): boolean | UrlTree => {
   const session = inject(SessionService);
-  if (session.account()) {
+  if (session.isAuthenticated()) {
     return true;
   }
   return inject(Router).createUrlTree(['/login']);

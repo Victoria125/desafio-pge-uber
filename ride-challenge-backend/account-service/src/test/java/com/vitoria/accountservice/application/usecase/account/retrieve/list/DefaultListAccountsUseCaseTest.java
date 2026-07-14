@@ -24,8 +24,8 @@ class DefaultListAccountsUseCaseTest {
     @Test
     void givenAValidQuery_whenCallsListAccounts_thenReturnAccounts() {
 
-        final Account aClient = Account.newAccount("Maria Silva", "maria@email.com", AccountType.CLIENT);
-        final Account aDriver = Account.newAccount("Joao Souza", "joao@email.com", AccountType.DRIVER);
+        final Account aClient = Account.newAccount("Maria Silva", "maria@email.com", "hashed-password", AccountType.CLIENT);
+        final Account aDriver = Account.newAccount("Joao Souza", "joao@email.com", "hashed-password", AccountType.DRIVER);
 
         when(this.accountGateway.getAll()).thenReturn(List.of(aClient, aDriver));
         final List<ListAccountsOutput> anOutput = this.useCase.execute();

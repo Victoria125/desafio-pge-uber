@@ -5,6 +5,10 @@ logging:
   level:
     org.springframework.cloud.gateway: DEBUG
 
+security:
+  jwt:
+    secret: ride-challenge-jwt-secret-key-32-bytes-minimum-value
+
 eureka:
   instance:
     prefer-ip-address: true
@@ -37,6 +41,11 @@ spring:
             locator:
               enabled: true
           routes:
+            - id: auth-route
+              uri: lb://ACCOUNT-SERVICE
+              predicates:
+                - Path=/auth/**
+
             - id: account-route
               uri: lb://ACCOUNT-SERVICE
               predicates:

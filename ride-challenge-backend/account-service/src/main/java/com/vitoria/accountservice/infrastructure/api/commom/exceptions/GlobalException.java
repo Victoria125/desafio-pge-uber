@@ -1,5 +1,6 @@
 package com.vitoria.accountservice.infrastructure.api.commom.exceptions;
 
+import com.vitoria.accountservice.domain.exceptions.InvalidCredentialsException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -45,6 +46,15 @@ public class GlobalException {
         error.put("Argument Exception", e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
+                .body(new CustomErrorResponse(error));
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<CustomErrorResponse> handle(InvalidCredentialsException e) {
+        Map<String, String> error = new HashMap<>();
+        error.put("Unauthorized", e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
                 .body(new CustomErrorResponse(error));
     }
 

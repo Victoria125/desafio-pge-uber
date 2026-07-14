@@ -56,7 +56,14 @@ describe('ClientRidesComponent', () => {
   let rideService: jasmine.SpyObj<RideService>;
 
   beforeEach(async () => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(account));
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        token: 'jwt-token',
+        expiresAt: Date.now() + 86_400_000,
+        account,
+      })
+    );
     rideService = jasmine.createSpyObj<RideService>('RideService', [
       'listRides',
       'createRide',

@@ -31,6 +31,12 @@ public class AccountPostgresGateway implements AccountGateway {
     }
 
     @Override
+    public Optional<Account> getByEmail(final String anEmail) {
+        return this.accountRepository.findByEmail(anEmail)
+                .map(AccountEntity::toAggregate);
+    }
+
+    @Override
     public List<Account> getAll() {
         return this.accountRepository
                 .findAll()

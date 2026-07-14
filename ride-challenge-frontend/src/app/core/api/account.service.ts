@@ -5,6 +5,8 @@ import type {
   AccountDto,
   CreateAccountRequestDto,
   CreateAccountResponseDto,
+  LoginRequestDto,
+  LoginResponseDto,
 } from './api-dtos';
 import { API_BASE_URL } from './api-base-url.token';
 import { apiRoutes } from './api-routes';
@@ -13,6 +15,10 @@ import { apiRoutes } from './api-routes';
 export class AccountService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = inject(API_BASE_URL);
+
+  login(body: LoginRequestDto): Observable<LoginResponseDto> {
+    return this.http.post<LoginResponseDto>(apiRoutes.login(this.baseUrl), body);
+  }
 
   createAccount(body: CreateAccountRequestDto): Observable<CreateAccountResponseDto> {
     return this.http.post<CreateAccountResponseDto>(apiRoutes.accounts(this.baseUrl), body);

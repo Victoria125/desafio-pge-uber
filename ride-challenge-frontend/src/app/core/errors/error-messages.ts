@@ -5,6 +5,7 @@ import type { ApiErrorResponseDto } from '../api/api-dtos';
 
 
 const STATUS_MESSAGES: Record<number, string> = {
+  401: 'Sessao expirada ou credenciais invalidas.',
   400: 'Erro de validação. Verifique o formulário e tente novamente.',
   404: 'Recurso não encontrado.',
   409: 'Conflito: a corrida já foi aceita por outro motorista.',

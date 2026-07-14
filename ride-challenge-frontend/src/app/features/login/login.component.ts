@@ -1,35 +1,25 @@
-﻿import {
+import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
-  computed,
   inject,
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Button } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputText } from 'primeng/inputtext';
-import { Select } from 'primeng/select';
-import { Tag } from 'primeng/tag';
-import { finalize } from 'rxjs/operators';
+import { finalize, switchMap } from 'rxjs/operators';
 import { AccountService } from '../../core/api/account.service';
-import type { AccountDto, AccountType } from '../../core/api/api-dtos';
+import type { AccountType, LoginResponseDto } from '../../core/api/api-dtos';
 import { SessionService } from '../../core/session/session.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [
-    ReactiveFormsModule,
-    Button,
-    Dialog,
-    InputText,
-    Select,
-    Tag,
-  ],
+  imports: [ReactiveFormsModule, Button, Dialog, InputText],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -41,41 +31,38 @@ export class LoginComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly fb = inject(FormBuilder);
 
-  protected readonly accounts = signal<AccountDto[]>([]);
-  protected readonly selectedType = signal<AccountType>('CLIENT');
-  protected readonly loading = signal(false);
+  protected readonly loggingIn = signal(false);
   protected readonly createDialogVisible = signal(false);
   protected readonly creating = signal(false);
+  protected readonly selectedType = signal<AccountType>('CLIENT');
 
-  protected readonly filteredAccounts = computed(() =>
-    this.accounts().filter((account) => account.type === this.selectedType())
-  );
-
-  protected readonly typeOptions: { label: string; value: AccountType }[] = [
-    { label: 'Cliente (passageiro)', value: 'CLIENT' },
-    { label: 'Motorista', value: 'DRIVER' },
-  ];
-
-  protected createForm = this.fb.nonNullable.group({
-    name: ['', [Validators.required, Validators.minLength(1)]],
+  protected readonly loginForm = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
-    type: this.fb.nonNullable.control<AccountType>('CLIENT', Validators.required),
+    password: ['', [Validators.required]],
   });
 
-  constructor() {
-    this.loadAccounts();
-  }
+  protected readonly createForm = this.fb.nonNullable.group({
+    name: ['', [Validators.required, Validators.minLength(1)]],
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(6)]],
+  });
 
-  protected loadAccounts(): void {
-    this.loading.set(true);
+  protected submitLogin(): void {
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      return;
+    }
+
+    this.loggingIn.set(true);
+    const { email, password } = this.loginForm.getRawValue();
     this.accountService
-      .listAccounts()
+      .login({ email: email.trim(), password })
       .pipe(
         takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.loading.set(false))
+        finalize(() => this.loggingIn.set(false))
       )
       .subscribe({
-        next: (list) => this.accounts.set(list),
+        next: (response) => this.completeLogin(response),
       });
   }
 
@@ -83,13 +70,8 @@ export class LoginComponent {
     this.selectedType.set(type);
   }
 
-  protected enter(account: AccountDto): void {
-    this.session.login(account);
-    this.router.navigate(['/']);
-  }
-
   protected openCreateDialog(): void {
-    this.createForm.reset({ name: '', email: '', type: this.selectedType() });
+    this.createForm.reset({ name: '', email: '', password: '' });
     this.createDialogVisible.set(true);
   }
 
@@ -104,27 +86,31 @@ export class LoginComponent {
     }
 
     this.creating.set(true);
-    const { name, email, type } = this.createForm.getRawValue();
+    const { name, email, password } = this.createForm.getRawValue();
+    const trimmedEmail = email.trim();
+
     this.accountService
-      .createAccount({ name: name.trim(), email: email.trim(), type })
+      .createAccount({
+        name: name.trim(),
+        email: trimmedEmail,
+        password,
+        type: this.selectedType(),
+      })
       .pipe(
+        switchMap(() => this.accountService.login({ email: trimmedEmail, password })),
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.creating.set(false))
       )
       .subscribe({
-        next: (res) => {
+        next: (response) => {
           this.closeCreateDialog();
-          this.selectedType.set(type);
-          this.enter({ id: res.id, name: name.trim(), email: email.trim(), type });
+          this.completeLogin(response);
         },
       });
   }
 
-  protected typeLabel(type: AccountType): string {
-    return type === 'DRIVER' ? 'Motorista' : 'Cliente';
-  }
-
-  protected typeCount(type: AccountType): number {
-    return this.accounts().filter((account) => account.type === type).length;
+  private completeLogin(response: LoginResponseDto): void {
+    this.session.login(response);
+    this.router.navigate(['/'], { replaceUrl: true });
   }
 }

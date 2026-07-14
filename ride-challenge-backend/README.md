@@ -87,6 +87,41 @@ localhost:9092
 
 Todas as rotas abaixo devem ser acessadas pelo gateway em `http://localhost:8080`.
 
+### Autenticacao
+
+Criar conta e login sao publicos. As demais rotas HTTP passam pelo gateway e exigem:
+
+```http
+Authorization: Bearer <token>
+```
+
+Login:
+
+```http
+POST /auth/login
+Content-Type: application/json
+```
+
+```json
+{
+  "email": "ana@example.com",
+  "password": "secret123"
+}
+```
+
+Resposta:
+
+```json
+{
+  "token": "jwt...",
+  "expiresIn": 86400,
+  "accountId": "id-da-conta",
+  "name": "Ana Cliente",
+  "email": "ana@example.com",
+  "type": "CLIENT"
+}
+```
+
 ### Contas
 
 Criar conta:
@@ -100,6 +135,7 @@ Content-Type: application/json
 {
   "name": "Ana Cliente",
   "email": "ana@example.com",
+  "password": "secret123",
   "type": "CLIENT"
 }
 ```
@@ -115,12 +151,14 @@ Listar contas:
 
 ```http
 GET /accounts
+Authorization: Bearer <token>
 ```
 
 Buscar conta por id:
 
 ```http
 GET /accounts/{id}
+Authorization: Bearer <token>
 ```
 
 ### Corridas
@@ -130,6 +168,7 @@ Criar corrida:
 ```http
 POST /rides
 Content-Type: application/json
+Authorization: Bearer <token>
 ```
 
 ```json
@@ -145,6 +184,7 @@ Editar origem e destino de uma corrida não finalizada:
 ```http
 PUT /rides/{id}
 Content-Type: application/json
+Authorization: Bearer <token>
 ```
 
 ```json
@@ -159,18 +199,21 @@ Listar corridas:
 
 ```http
 GET /rides
+Authorization: Bearer <token>
 ```
 
 Buscar corrida por id:
 
 ```http
 GET /rides/{id}
+Authorization: Bearer <token>
 ```
 
 Consultar status:
 
 ```http
 GET /rides/{id}/status
+Authorization: Bearer <token>
 ```
 
 Aceitar corrida:
@@ -178,6 +221,7 @@ Aceitar corrida:
 ```http
 POST /rides/{id}/accept
 Content-Type: application/json
+Authorization: Bearer <token>
 ```
 
 ```json
@@ -257,10 +301,12 @@ As respostas seguem o formato:
 ## Fluxo demonstrável
 
 1. Subir os containers com `docker compose up --build`.
-2. Criar uma conta `CLIENT`.
-3. Criar uma conta `DRIVER`.
-4. Criar uma corrida com o id do cliente.
-5. Opcionalmente editar origem e destino antes da corrida ser finalizada.
-6. Ver a mensagem publicada na fila Kafka e enviada via WebSocket.
-7. Aceitar a corrida com o id do motorista.
-8. Consultar a corrida e verificar status `IN_PROGRESS` com o motorista vinculado.
+2. Criar uma conta `CLIENT` com senha.
+3. Fazer login com a conta `CLIENT` e guardar o token JWT.
+4. Criar uma conta `DRIVER` com senha.
+5. Fazer login com a conta `DRIVER` e guardar o token JWT.
+6. Criar uma corrida com o id do cliente usando `Authorization: Bearer <token-do-cliente>`.
+7. Opcionalmente editar origem e destino antes da corrida ser finalizada.
+8. Ver a mensagem publicada na fila Kafka e enviada via WebSocket.
+9. Aceitar a corrida com o id do motorista usando `Authorization: Bearer <token-do-motorista>`.
+10. Consultar a corrida e verificar status `IN_PROGRESS` com o motorista vinculado.

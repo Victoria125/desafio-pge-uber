@@ -47,7 +47,14 @@ describe('DriverAvailableRidesComponent', () => {
   let notificationService: jasmine.SpyObj<RideNotificationService>;
 
   beforeEach(async () => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(account));
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        token: 'jwt-token',
+        expiresAt: Date.now() + 86_400_000,
+        account,
+      })
+    );
     notifications$ = new Subject<RideNotificationDto>();
 
     rideService = jasmine.createSpyObj<RideService>('RideService', [

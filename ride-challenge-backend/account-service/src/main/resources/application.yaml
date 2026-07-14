@@ -3,3 +3,8 @@ spring:
     name: account-service
   config:
     import: optional:configserver:http://localhost:8888
+
+security:
+  jwt:
+    secret: ride-challenge-jwt-secret-key-32-bytes-minimum-value
+    expiration-seconds: 86400

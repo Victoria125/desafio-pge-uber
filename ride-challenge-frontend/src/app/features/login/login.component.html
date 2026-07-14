@@ -11,7 +11,8 @@
       <p class="eyebrow">API Gateway + WebSocket</p>
       <h1>Corridas em tempo real para cliente e motorista.</h1>
       <p>
-        Crie uma solicitação como passageiro, acompanhe o status e aceite chamadas como motorista usando os dados reais do backend.
+        Entre com sua conta para solicitar corridas, acompanhar status e aceitar
+        chamadas como motorista usando os dados reais do backend.
       </p>
     </div>
 
@@ -30,90 +31,91 @@
         Destino
       </div>
     </div>
-
-    <div class="showcase-metrics">
-      <div>
-        <strong>{{ typeCount('CLIENT') }}</strong>
-        <span>clientes</span>
-      </div>
-      <div>
-        <strong>{{ typeCount('DRIVER') }}</strong>
-        <span>motoristas</span>
-      </div>
-    </div>
   </section>
 
   <section class="user-form">
     <div class="user-form-header">
       <p class="form-kicker">Entrar</p>
       <h2>Bem-vindo!</h2>
-      <p>Escolha uma conta para continuar sua corrida.</p>
+      <p>Use seu email e senha para continuar.</p>
     </div>
 
-    <div class="profile-switch" role="tablist" aria-label="Tipo de conta">
-      <button
-        type="button"
-        class="profile-option"
-        [class.is-active]="selectedType() === 'CLIENT'"
-        (click)="selectType('CLIENT')"
-      >
-        <i class="pi pi-user"></i>
-        <span>Cliente</span>
-      </button>
-      <button
-        type="button"
-        class="profile-option"
-        [class.is-active]="selectedType() === 'DRIVER'"
-        (click)="selectType('DRIVER')"
-      >
-        <i class="pi pi-id-card"></i>
-        <span>Motorista</span>
-      </button>
-    </div>
+    <form class="login-form" [formGroup]="loginForm" (ngSubmit)="submitLogin()">
+      <div class="profile-switch" role="tablist" aria-label="Tipo de conta">
+        <button
+          type="button"
+          class="profile-option"
+          [class.is-active]="selectedType() === 'CLIENT'"
+          [attr.aria-selected]="selectedType() === 'CLIENT'"
+          (click)="selectType('CLIENT')"
+        >
+          <i class="pi pi-user"></i>
+          <span>Passageiro</span>
+        </button>
+        <button
+          type="button"
+          class="profile-option"
+          [class.is-active]="selectedType() === 'DRIVER'"
+          [attr.aria-selected]="selectedType() === 'DRIVER'"
+          (click)="selectType('DRIVER')"
+        >
+          <i class="pi pi-id-card"></i>
+          <span>Motorista</span>
+        </button>
+      </div>
 
-    <div class="accounts-panel" [class.is-loading]="loading()">
-      @if (loading()) {
-        <div class="loading-state">
-          <i class="pi pi-spin pi-spinner"></i>
-          <span>Carregando contas...</span>
+      <div class="field">
+        <label for="login-email">E-mail</label>
+        <input
+          id="login-email"
+          type="email"
+          pInputText
+          formControlName="email"
+          placeholder="seu@email.com"
+          class="w-full"
+        />
+        <div class="field-validation">
+          @if (loginForm.controls.email.touched && loginForm.controls.email.errors) {
+            <small class="p-error block mt-1">Informe um e-mail valido.</small>
+          }
         </div>
-      } @else {
-        @if (filteredAccounts().length) {
-          <div class="account-list">
-            @for (account of filteredAccounts(); track account.id) {
-              <button type="button" class="account-card" (click)="enter(account)">
-                <span class="account-avatar" [class.driver-avatar]="account.type === 'DRIVER'">
-                  <i [class]="account.type === 'DRIVER' ? 'pi pi-id-card' : 'pi pi-user'"></i>
-                </span>
-                <span class="account-info">
-                  <strong>{{ account.name }}</strong>
-                  <small>{{ account.email }}</small>
-                </span>
-                <p-tag [value]="typeLabel(account.type)" [severity]="account.type === 'DRIVER' ? 'success' : 'info'" />
-              </button>
-            }
-          </div>
-        } @else {
-          <p class="empty-message">Nenhuma conta encontrada para este perfil.</p>
-        }
-      }
-    </div>
+      </div>
 
-    <div class="form-actions">
-      <p-button
-        label="Atualizar"
-        icon="pi pi-refresh"
-        severity="secondary"
-        [outlined]="true"
-        [loading]="loading()"
-        (onClick)="loadAccounts()"
-      />
-      <p-button
-        label="Criar conta"
-        icon="pi pi-plus"
-        (onClick)="openCreateDialog()"
-      />
-    </div>
+      <div class="field">
+        <label for="login-password">Senha</label>
+        <input
+          id="login-password"
+          type="password"
+          pInputText
+          formControlName="password"
+          placeholder="Sua senha"
+          class="w-full"
+        />
+        <div class="field-validation">
+          @if (loginForm.controls.password.touched && loginForm.controls.password.errors) {
+            <small class="p-error block mt-1">Senha obrigatoria.</small>
+          }
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <p-button
+          type="submit"
+          label="Entrar"
+          icon="pi pi-sign-in"
+          [loading]="loggingIn()"
+          [disabled]="loggingIn()"
+        />
+        <p-button
+          type="button"
+          label="Criar conta"
+          icon="pi pi-plus"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="openCreateDialog()"
+        />
+      </div>
+    </form>
   </section>
 
   <p-dialog
@@ -140,10 +142,11 @@
         />
         <div class="field-validation">
           @if (createForm.controls.name.touched && createForm.controls.name.errors) {
-            <small class="p-error block mt-1">Nome é obrigatório.</small>
+            <small class="p-error block mt-1">Nome obrigatorio.</small>
           }
         </div>
       </div>
+
       <div class="field">
         <label for="account-email">E-mail</label>
         <input
@@ -156,25 +159,29 @@
         />
         <div class="field-validation">
           @if (createForm.controls.email.touched && createForm.controls.email.errors) {
-            <small class="p-error block mt-1">Informe um e-mail válido.</small>
+            <small class="p-error block mt-1">Informe um e-mail valido.</small>
           }
         </div>
       </div>
+
       <div class="field">
-        <label for="account-type">Tipo</label>
-        <p-select
-          id="account-type"
-          formControlName="type"
-          [options]="typeOptions"
-          optionLabel="label"
-          optionValue="value"
-          [appendTo]="'body'"
-          panelStyleClass="account-type-panel"
-          class="w-full account-type-select"
+        <label for="account-password">Senha</label>
+        <input
+          id="account-password"
+          type="password"
+          pInputText
+          formControlName="password"
+          placeholder="Minimo de 6 caracteres"
+          class="w-full"
         />
-        <div class="field-validation"></div>
+        <div class="field-validation">
+          @if (createForm.controls.password.touched && createForm.controls.password.errors) {
+            <small class="p-error block mt-1">Use pelo menos 6 caracteres.</small>
+          }
+        </div>
       </div>
     </form>
+
     <div class="account-dialog-actions">
       <p-button
         label="Cancelar"
@@ -184,6 +191,7 @@
       />
       <p-button
         label="Cadastrar"
+        icon="pi pi-check"
         (onClick)="submitCreate()"
         [loading]="creating()"
         [disabled]="creating()"

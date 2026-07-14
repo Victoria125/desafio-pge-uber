@@ -4,6 +4,7 @@ import com.vitoria.accountservice.domain.enums.AccountType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 public record CreateAccountRequest(
         @NotBlank(message = "'name' should be not blank")
@@ -12,6 +13,10 @@ public record CreateAccountRequest(
         @NotBlank(message = "'email' should be not blank")
         @Email(message = "'email' should be a valid email")
         String email,
+
+        @NotBlank(message = "'password' should be not blank")
+        @Size(min = 6, message = "'password' should have at least 6 characters")
+        String password,
 
         @NotNull(message = "'type' should be CLIENT or DRIVER")
         AccountType type

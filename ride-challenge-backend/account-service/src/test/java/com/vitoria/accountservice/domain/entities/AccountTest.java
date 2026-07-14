@@ -9,85 +9,94 @@ class AccountTest {
 
     @Test
     void givenAValidParams_whenCallsNewAccount_thenInstantiateAnAccount() {
-        
         final String expectedName = "Maria Silva";
         final String expectedEmail = "maria@email.com";
+        final String expectedPasswordHash = "$2a$10$hash";
         final AccountType expectedType = AccountType.CLIENT;
 
-        
-        final Account anAccount = Account.newAccount(expectedName, expectedEmail, expectedType);
+        final Account anAccount = Account.newAccount(
+                expectedName,
+                expectedEmail,
+                expectedPasswordHash,
+                expectedType
+        );
 
-        
         assertNotNull(anAccount);
         assertNotNull(anAccount.getId());
         assertNotNull(anAccount.getCreatedAt());
         assertEquals(expectedName, anAccount.getName());
         assertEquals(expectedEmail, anAccount.getEmail());
+        assertEquals(expectedPasswordHash, anAccount.getPasswordHash());
         assertEquals(expectedType, anAccount.getType());
     }
 
     @Test
     void givenAnInvalidNullName_whenCallsNewAccount_thenThrowsException() {
-        
         final String expectedMessageError = "'name' should be not null";
 
-        
         final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> Account.newAccount(null, "maria@email.com", AccountType.CLIENT));
+                () -> Account.newAccount(null, "maria@email.com", "$2a$10$hash", AccountType.CLIENT));
 
-        
         assertEquals(expectedMessageError, exception.getMessage());
     }
 
     @Test
     void givenAnInvalidBlankName_whenCallsNewAccount_thenThrowsException() {
-        
         final String expectedMessageError = "'name' should be not blank";
 
-        
         final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> Account.newAccount("   ", "maria@email.com", AccountType.CLIENT));
+                () -> Account.newAccount("   ", "maria@email.com", "$2a$10$hash", AccountType.CLIENT));
 
-        
         assertEquals(expectedMessageError, exception.getMessage());
     }
 
     @Test
     void givenAnInvalidNullEmail_whenCallsNewAccount_thenThrowsException() {
-        
         final String expectedMessageError = "'email' should be not null";
 
-        
         final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> Account.newAccount("Maria Silva", null, AccountType.CLIENT));
+                () -> Account.newAccount("Maria Silva", null, "$2a$10$hash", AccountType.CLIENT));
 
-        
         assertEquals(expectedMessageError, exception.getMessage());
     }
 
     @Test
     void givenAnInvalidBlankEmail_whenCallsNewAccount_thenThrowsException() {
-        
         final String expectedMessageError = "'email' should be not blank";
 
-        
         final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> Account.newAccount("Maria Silva", "  ", AccountType.CLIENT));
+                () -> Account.newAccount("Maria Silva", "  ", "$2a$10$hash", AccountType.CLIENT));
 
-        
+        assertEquals(expectedMessageError, exception.getMessage());
+    }
+
+    @Test
+    void givenAnInvalidNullPasswordHash_whenCallsNewAccount_thenThrowsException() {
+        final String expectedMessageError = "'password' should be not null";
+
+        final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> Account.newAccount("Maria Silva", "maria@email.com", null, AccountType.CLIENT));
+
+        assertEquals(expectedMessageError, exception.getMessage());
+    }
+
+    @Test
+    void givenAnInvalidBlankPasswordHash_whenCallsNewAccount_thenThrowsException() {
+        final String expectedMessageError = "'password' should be not blank";
+
+        final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> Account.newAccount("Maria Silva", "maria@email.com", "  ", AccountType.CLIENT));
+
         assertEquals(expectedMessageError, exception.getMessage());
     }
 
     @Test
     void givenAnInvalidNullType_whenCallsNewAccount_thenThrowsException() {
-        
         final String expectedMessageError = "'type' should be not null";
 
-        
         final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> Account.newAccount("Maria Silva", "maria@email.com", null));
+                () -> Account.newAccount("Maria Silva", "maria@email.com", "$2a$10$hash", null));
 
-        
         assertEquals(expectedMessageError, exception.getMessage());
     }
 }

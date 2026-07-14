@@ -1,13 +1,15 @@
 {
   "info": {
     "name": "Ride Challenge - API Gateway",
-    "description": "Fluxo completo do desafio de corridas via API Gateway (porta 8080).\n\nOrdem sugerida de execucao:\n1. Accounts > Criar conta (cliente)\n2. Accounts > Criar conta (motorista)\n3. Rides > Criar corrida\n4. Rides > Consultar status\n5. Rides > Aceitar corrida (motorista)\n6. Rides > Consultar status (agora IN_PROGRESS, vindo do Redis)\n\nOs IDs retornados sao salvos automaticamente nas variaveis da collection (clientId, driverId, rideId).",
+    "description": "Fluxo completo do desafio de corridas via API Gateway (porta 8080).\n\nOrdem sugerida de execucao:\n1. Accounts > Criar conta (cliente)\n2. Accounts > Login (cliente)\n3. Accounts > Criar conta (motorista)\n4. Accounts > Login (motorista)\n5. Rides > Criar corrida\n6. Rides > Consultar status\n7. Rides > Aceitar corrida (motorista)\n8. Rides > Consultar status (agora IN_PROGRESS, vindo do Redis)\n\nOs IDs e tokens retornados sao salvos automaticamente nas variaveis da collection (clientId, driverId, rideId, clientToken, driverToken).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     { "key": "baseUrl", "value": "http://localhost:8080" },
     { "key": "clientId", "value": "" },
     { "key": "driverId", "value": "" },
+    { "key": "clientToken", "value": "" },
+    { "key": "driverToken", "value": "" },
     { "key": "rideId", "value": "" }
   ],
   "item": [
@@ -36,7 +38,34 @@
             "url": "{{baseUrl}}/accounts",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Maria Silva\",\n  \"email\": \"maria@email.com\",\n  \"type\": \"CLIENT\"\n}"
+              "raw": "{\n  \"name\": \"Maria Silva\",\n  \"email\": \"maria@email.com\",\n  \"password\": \"secret123\",\n  \"type\": \"CLIENT\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login (cliente)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.test('Retorna token JWT', () => pm.expect(json.token).to.be.a('string'));",
+                  "pm.collectionVariables.set('clientToken', json.token);",
+                  "pm.collectionVariables.set('clientId', json.accountId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"maria@email.com\",\n  \"password\": \"secret123\"\n}"
             }
           }
         },
@@ -61,7 +90,34 @@
             "url": "{{baseUrl}}/accounts",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Joao Souza\",\n  \"email\": \"joao@email.com\",\n  \"type\": \"DRIVER\"\n}"
+              "raw": "{\n  \"name\": \"Joao Souza\",\n  \"email\": \"joao@email.com\",\n  \"password\": \"secret123\",\n  \"type\": \"DRIVER\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login (motorista)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.test('Retorna token JWT', () => pm.expect(json.token).to.be.a('string'));",
+                  "pm.collectionVariables.set('driverToken', json.token);",
+                  "pm.collectionVariables.set('driverId', json.accountId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"joao@email.com\",\n  \"password\": \"secret123\"\n}"
             }
           }
         },
@@ -81,6 +137,7 @@
           ],
           "request": {
             "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{clientToken}}" }],
             "url": "{{baseUrl}}/accounts"
           }
         },
@@ -99,6 +156,7 @@
           ],
           "request": {
             "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{clientToken}}" }],
             "url": "{{baseUrl}}/accounts/{{clientId}}"
           }
         }
@@ -125,7 +183,10 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{clientToken}}" }
+            ],
             "url": "{{baseUrl}}/rides",
             "body": {
               "mode": "raw",
@@ -149,6 +210,7 @@
           ],
           "request": {
             "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{clientToken}}" }],
             "url": "{{baseUrl}}/rides"
           }
         },
@@ -167,6 +229,7 @@
           ],
           "request": {
             "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{clientToken}}" }],
             "url": "{{baseUrl}}/rides/{{rideId}}"
           }
         },
@@ -187,6 +250,7 @@
           ],
           "request": {
             "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{clientToken}}" }],
             "url": "{{baseUrl}}/rides/{{rideId}}/status"
           }
         },
@@ -207,7 +271,10 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{driverToken}}" }
+            ],
             "url": "{{baseUrl}}/rides/{{rideId}}/accept",
             "body": {
               "mode": "raw",
@@ -230,7 +297,10 @@
           ],
           "request": {
             "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{clientToken}}" }
+            ],
             "url": "{{baseUrl}}/rides/{{rideId}}",
             "body": {
               "mode": "raw",

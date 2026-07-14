@@ -37,7 +37,7 @@ public class AccountController implements AccountAPI {
     @Override
     public ResponseEntity<CreateAccountResponse> createAccount(final CreateAccountRequest aRequest) {
         final CreateAccountCommand aCommand =
-                new CreateAccountCommand(aRequest.name(), aRequest.email(), aRequest.type());
+                new CreateAccountCommand(aRequest.name(), aRequest.email(), aRequest.password(), aRequest.type());
         final CreateAccountOutput anOutput = this.createAccountUseCase.execute(aCommand);
         return ResponseEntity
                 .created(URI.create("/accounts/" + anOutput.id()))
