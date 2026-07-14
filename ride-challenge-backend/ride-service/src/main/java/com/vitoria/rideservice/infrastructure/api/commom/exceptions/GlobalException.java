@@ -1,10 +1,12 @@
 package com.vitoria.rideservice.infrastructure.api.commom.exceptions;
 
+import com.vitoria.rideservice.domain.exceptions.ForbiddenOperationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -37,6 +39,24 @@ public class GlobalException {
         error.put("Malformed request", "Request body is invalid or has invalid values");
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
+                .body(new CustomErrorResponse(error));
+    }
+
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    public ResponseEntity<CustomErrorResponse> handle(MissingRequestHeaderException e) {
+        Map<String, String> error = new HashMap<>();
+        error.put("Unauthorized", "Missing authenticated identity header '" + e.getHeaderName() + "'");
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(new CustomErrorResponse(error));
+    }
+
+    @ExceptionHandler(ForbiddenOperationException.class)
+    public ResponseEntity<CustomErrorResponse> handle(ForbiddenOperationException e) {
+        Map<String, String> error = new HashMap<>();
+        error.put("Forbidden", e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
                 .body(new CustomErrorResponse(error));
     }
 

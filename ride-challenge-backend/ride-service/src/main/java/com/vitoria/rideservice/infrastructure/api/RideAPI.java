@@ -16,11 +16,16 @@ import java.util.List;
 
 @RequestMapping(value = "/rides")
 public interface RideAPI {
+    String USER_ID_HEADER = "X-User-Id";
+    String USER_TYPE_HEADER = "X-User-Type";
 
     @PostMapping(
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<CreateRideResponse> createRide(@Valid @RequestBody CreateRideRequest aRequest);
+    ResponseEntity<CreateRideResponse> createRide(
+            @RequestHeader(name = USER_ID_HEADER) String authenticatedUserId,
+            @RequestHeader(name = USER_TYPE_HEADER) String authenticatedUserType,
+            @Valid @RequestBody CreateRideRequest aRequest);
 
     @PutMapping(
             value = "/{id}",
@@ -28,6 +33,8 @@ public interface RideAPI {
             produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<RideResponse> updateRide(
             @PathVariable(name = "id") String id,
+            @RequestHeader(name = USER_ID_HEADER) String authenticatedUserId,
+            @RequestHeader(name = USER_TYPE_HEADER) String authenticatedUserType,
             @Valid @RequestBody UpdateRideRequest aRequest);
 
     @PostMapping(
@@ -36,6 +43,8 @@ public interface RideAPI {
             produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<RideResponse> acceptRide(
             @PathVariable(name = "id") String id,
+            @RequestHeader(name = USER_ID_HEADER) String authenticatedUserId,
+            @RequestHeader(name = USER_TYPE_HEADER) String authenticatedUserType,
             @Valid @RequestBody AcceptRideRequest aRequest);
 
     @GetMapping(

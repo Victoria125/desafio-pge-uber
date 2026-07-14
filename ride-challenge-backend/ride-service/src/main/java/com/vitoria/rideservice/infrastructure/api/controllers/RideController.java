@@ -11,6 +11,7 @@ import com.vitoria.rideservice.application.usecase.ride.retrieve.getstatus.RideS
 import com.vitoria.rideservice.application.usecase.ride.retrieve.list.ListRidesUseCase;
 import com.vitoria.rideservice.application.usecase.ride.update.UpdateRideCommand;
 import com.vitoria.rideservice.application.usecase.ride.update.UpdateRideUseCase;
+import com.vitoria.rideservice.domain.exceptions.ForbiddenOperationException;
 import com.vitoria.rideservice.infrastructure.api.RideAPI;
 import com.vitoria.rideservice.infrastructure.api.models.AcceptRideRequest;
 import com.vitoria.rideservice.infrastructure.api.models.CreateRideRequest;
@@ -53,7 +54,14 @@ public class RideController implements RideAPI {
     }
 
     @Override
-    public ResponseEntity<CreateRideResponse> createRide(final CreateRideRequest aRequest) {
+    public ResponseEntity<CreateRideResponse> createRide(
+            final String authenticatedUserId,
+            final String authenticatedUserType,
+            final CreateRideRequest aRequest
+    ) {
+        requireType(authenticatedUserType, "CLIENT", "Only clients can create rides");
+        requireSameIdentity(authenticatedUserId, aRequest.userId(), "'userId' must match the authenticated user");
+
         final CreateRideCommand aCommand = new CreateRideCommand(
                 aRequest.userId(),
                 aRequest.startAddress(),
@@ -66,7 +74,15 @@ public class RideController implements RideAPI {
     }
 
     @Override
-    public ResponseEntity<RideResponse> updateRide(final String id, final UpdateRideRequest aRequest) {
+    public ResponseEntity<RideResponse> updateRide(
+            final String id,
+            final String authenticatedUserId,
+            final String authenticatedUserType,
+            final UpdateRideRequest aRequest
+    ) {
+        requireType(authenticatedUserType, "CLIENT", "Only clients can update rides");
+        requireSameIdentity(authenticatedUserId, aRequest.userId(), "'userId' must match the authenticated user");
+
         final RideResponse response = RidePresenter.presenterSimple
                 .apply(this.updateRideUseCase.execute(new UpdateRideCommand(
                         id,
@@ -78,10 +94,30 @@ public class RideController implements RideAPI {
     }
 
     @Override
-    public ResponseEntity<RideResponse> acceptRide(final String id, final AcceptRideRequest aRequest) {
+    public ResponseEntity<RideResponse> acceptRide(
+            final String id,
+            final String authenticatedUserId,
+            final String authenticatedUserType,
+            final AcceptRideRequest aRequest
+    ) {
+        requireType(authenticatedUserType, "DRIVER", "Only drivers can accept rides");
+        requireSameIdentity(authenticatedUserId, aRequest.driverId(), "'driverId' must match the authenticated user");
+
         final RideResponse response = RidePresenter.presenterSimple
                 .apply(this.acceptRideUseCase.execute(new AcceptRideCommand(id, aRequest.driverId())));
         return ResponseEntity.ok(response);
+    }
+
+    private static void requireType(final String actualType, final String expectedType, final String message) {
+        if (!expectedType.equals(actualType)) {
+            throw new ForbiddenOperationException(message);
+        }
+    }
+
+    private static void requireSameIdentity(final String authenticatedId, final String requestedId, final String message) {
+        if (!authenticatedId.equals(requestedId)) {
+            throw new ForbiddenOperationException(message);
+        }
     }
 
     @Override

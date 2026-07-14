@@ -1,5 +1,6 @@
 package com.vitoria.apigateway.security;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -21,6 +22,9 @@ import java.util.Optional;
 
 @Component
 public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
+    public static final String USER_ID_HEADER = "X-User-Id";
+    public static final String USER_TYPE_HEADER = "X-User-Type";
+
     private static final String BEARER_PREFIX = "Bearer ";
 
     private final SecretKey secretKey;
@@ -33,16 +37,38 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
     public Mono<Void> filter(final ServerWebExchange exchange, final GatewayFilterChain chain) {
         final ServerHttpRequest request = exchange.getRequest();
         if (isPublicRequest(request)) {
-            return chain.filter(exchange);
+            return chain.filter(withoutIdentityHeaders(exchange));
         }
 
-        final Optional<String> token = resolveToken(request);
-        if (token.isEmpty() || !isValid(token.get())) {
+        final Optional<Claims> claims = resolveToken(request).flatMap(this::parseClaims);
+        if (claims.isEmpty()) {
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
         }
 
-        return chain.filter(exchange);
+        return chain.filter(withIdentityHeaders(exchange, claims.get()));
+    }
+
+    private ServerWebExchange withoutIdentityHeaders(final ServerWebExchange exchange) {
+        final ServerHttpRequest request = exchange.getRequest().mutate()
+                .headers(headers -> {
+                    headers.remove(USER_ID_HEADER);
+                    headers.remove(USER_TYPE_HEADER);
+                })
+                .build();
+        return exchange.mutate().request(request).build();
+    }
+
+    private ServerWebExchange withIdentityHeaders(final ServerWebExchange exchange, final Claims claims) {
+        final ServerHttpRequest request = exchange.getRequest().mutate()
+                .headers(headers -> {
+                    headers.remove(USER_ID_HEADER);
+                    headers.remove(USER_TYPE_HEADER);
+                })
+                .header(USER_ID_HEADER, claims.getSubject())
+                .header(USER_TYPE_HEADER, claims.get("type", String.class))
+                .build();
+        return exchange.mutate().request(request).build();
     }
 
     private boolean isPublicRequest(final ServerHttpRequest request) {
@@ -69,15 +95,15 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
         return Optional.empty();
     }
 
-    private boolean isValid(final String token) {
+    private Optional<Claims> parseClaims(final String token) {
         try {
-            Jwts.parser()
+            return Optional.of(Jwts.parser()
                     .verifyWith(this.secretKey)
                     .build()
-                    .parseSignedClaims(token);
-            return true;
+                    .parseSignedClaims(token)
+                    .getPayload());
         } catch (JwtException | IllegalArgumentException e) {
-            return false;
+            return Optional.empty();
         }
     }
 

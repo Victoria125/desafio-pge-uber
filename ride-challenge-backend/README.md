@@ -95,6 +95,16 @@ Criar conta e login sao publicos. As demais rotas HTTP passam pelo gateway e exi
 Authorization: Bearer <token>
 ```
 
+Apos validar o token, o gateway extrai a identidade das claims e a propaga para os
+servicos internos nos headers `X-User-Id` e `X-User-Type` (removendo qualquer valor
+enviado pelo cliente, para evitar spoofing). O ride-service usa esses headers para
+autorizar as operacoes:
+
+- `POST /rides` e `PUT /rides/{id}`: apenas `CLIENT`, e o `userId` do body deve ser o proprio usuario autenticado.
+- `POST /rides/{id}/accept`: apenas `DRIVER`, e o `driverId` do body deve ser o proprio motorista autenticado.
+
+Violacoes retornam `403 Forbidden`; requisicoes sem os headers de identidade (fora do gateway) retornam `401 Unauthorized`.
+
 Login:
 
 ```http
