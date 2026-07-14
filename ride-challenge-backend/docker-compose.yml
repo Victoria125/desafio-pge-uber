@@ -103,6 +103,7 @@ services:
     environment:
       SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888
       SPRING_PROFILES_ACTIVE: docker
+      SECURITY_JWT_SECRET: ${JWT_SECRET:-ride-challenge-jwt-secret-key-32-bytes-minimum-value}
     depends_on:
       config-server:
         condition: service_healthy
@@ -153,6 +154,7 @@ services:
     environment:
       SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888
       SPRING_PROFILES_ACTIVE: docker
+      SECURITY_JWT_SECRET: ${JWT_SECRET:-ride-challenge-jwt-secret-key-32-bytes-minimum-value}
     ports:
 
       - "8080:8080"

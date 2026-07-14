@@ -7,7 +7,7 @@ logging:
 
 security:
   jwt:
-    secret: ride-challenge-jwt-secret-key-32-bytes-minimum-value
+    secret: ${SECURITY_JWT_SECRET:ride-challenge-jwt-secret-key-32-bytes-minimum-value}
 
 eureka:
   instance:

@@ -105,6 +105,10 @@ autorizar as operacoes:
 
 Violacoes retornam `403 Forbidden`; requisicoes sem os headers de identidade (fora do gateway) retornam `401 Unauthorized`.
 
+O segredo usado para assinar/validar o JWT pode ser sobrescrito pela variavel de
+ambiente `SECURITY_JWT_SECRET` (no docker-compose, basta exportar `JWT_SECRET` antes
+do `docker compose up`). Sem a variavel, um valor padrao de desenvolvimento e usado.
+
 Login:
 
 ```http
