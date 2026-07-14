@@ -17,6 +17,8 @@ A aplicação foi organizada em microsserviços para separar configuração, des
 - WebSocket/STOMP
 - Docker Compose
 - JUnit e Mockito
+- Testcontainers
+- JaCoCo
 
 ## Arquitetura
 
@@ -28,6 +30,7 @@ A aplicação foi organizada em microsserviços para separar configuração, des
 - `postgres`: persistência de contas e corridas.
 - `kafka`: fila de pedidos de corrida.
 - `redis`: cache de status das corridas.
+- `frontend`: aplicação Angular servida por nginx em `localhost:4200`.
 
 ## Como rodar com Docker
 
@@ -46,6 +49,14 @@ Para rodar em segundo plano:
 
 ```bash
 docker compose up -d --build
+```
+
+O compose sobe toda a infraestrutura, os microsserviços e o frontend, respeitando a ordem de inicialização via healthchecks (`depends_on` com `condition: service_healthy`).
+
+Frontend:
+
+```text
+http://localhost:4200
 ```
 
 Gateway da API:
@@ -206,19 +217,23 @@ Quando expiram, elas são marcadas como `CANCELLED` e uma notificação é envia
 
 Na pasta `ride-challenge-backend`, execute:
 
-Windows:
-
-```bash
-.\mvnw.cmd test
-```
-
-Linux/macOS:
+Testes unitários (rápidos, sem Docker):
 
 ```bash
 ./mvnw test
 ```
 
-Os testes cobrem cenários funcionais e de erro dos casos de uso principais, incluindo criação de conta, criação de corrida, edição de rota, aceite, consulta de status e timeout.
+Build completo com testes de integração e gate de cobertura (precisa de Docker):
+
+```bash
+./mvnw clean verify
+```
+
+No Windows, use `.\mvnw.cmd` no lugar de `./mvnw`. Para pular os testes de integração em máquinas sem Docker, use `-DskipITs`.
+
+Os testes unitários cobrem cenários funcionais e de erro dos casos de uso principais, incluindo criação de conta, criação de corrida, edição de rota, aceite, consulta de status e timeout. Os testes de integração validam os gateways de persistência contra um PostgreSQL real via Testcontainers. O JaCoCo falha o build se a cobertura de domínio e aplicação ficar abaixo de 90%, e o relatório fica em `*/target/site/jacoco/index.html`.
+
+A estratégia completa de testes está documentada em [`TESTING.md`](../TESTING.md). Há também uma collection do Postman com o fluxo completo em [`postman/`](../postman/). O pipeline de CI em `.github/workflows/ci.yml` roda tudo isso a cada push.
 
 ## Tratamento de erros
 

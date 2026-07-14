@@ -6,6 +6,10 @@ dist
 *.md
 !README.md
 .angular
+cypress
+cypress.config.ts
+Dockerfile
+.dockerignore
 .cursor
 .vscode
 coverage

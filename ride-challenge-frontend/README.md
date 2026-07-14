@@ -14,6 +14,7 @@ A aplicação consome a API REST do backend pelo API Gateway, usa WebSocket/STOM
 - Jasmine
 - Karma
 - ChromeHeadless para testes automatizados
+- Cypress para testes E2E
 
 ## Pré-requisitos
 
@@ -76,6 +77,14 @@ O projeto possui testes para:
 - receber corrida via WebSocket;
 - exibir toast de erro claro para falhas da API.
 
+Rodar os smoke tests E2E com Cypress (com o `npm start` rodando em outro terminal):
+
+```bash
+npm run e2e:run
+```
+
+Os smoke tests cobrem o redirect de visitante sem sessão para o login, a renderização e o filtro de contas por perfil e a entrada como cliente até a tela de corridas. A API é stubada com `cy.intercept`, então rodam sem backend de pé.
+
 ## Build
 
 ```bash
@@ -83,6 +92,16 @@ npm run build
 ```
 
 Os arquivos de produção são gerados em `dist/ride-challenge-frontend`.
+
+## Docker
+
+O frontend possui um `Dockerfile` multi-stage (build Node + nginx) e faz parte do `docker-compose.yml` do backend. Ao subir o compose, a aplicação fica disponível em `http://localhost:4200` servida por nginx, sem precisar de `npm start`.
+
+Para buildar a imagem isoladamente:
+
+```bash
+docker build -t ride-frontend .
+```
 
 ## Fluxo da aplicação
 
