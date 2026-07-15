@@ -93,6 +93,12 @@ npm run e2e:run
 
 Os smoke tests cobrem o redirect de visitante sem sessao para o login, a renderizacao do formulario de email/senha e a entrada como cliente ate a tela de corridas. A API e stubada com `cy.intercept`, entao rodam sem backend de pe.
 
+Ha tambem um fluxo E2E contra o backend real (`cypress/e2e/fluxo-real.cy.ts`): cadastra um cliente, cria uma corrida, cadastra um motorista e aceita a corrida, alem de validar a recusa de senha errada. Ele exige o stack completo no ar (`docker compose up` no backend, frontend em `http://localhost:4200`) e roda com:
+
+```bash
+npm run e2e:real
+```
+
 ## Build
 
 ```bash

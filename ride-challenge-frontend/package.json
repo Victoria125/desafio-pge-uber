@@ -8,7 +8,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "e2e": "cypress open",
-    "e2e:run": "cypress run"
+    "e2e:run": "cypress run",
+    "e2e:real": "cypress run --env REAL=1 --spec cypress/e2e/fluxo-real.cy.ts"
   },
   "private": true,
   "packageManager": "npm@10.8.2",
