@@ -40,4 +40,8 @@ export class RideService {
   acceptRide(rideId: string, body: AcceptRideRequestDto): Observable<RideDto> {
     return this.http.post<RideDto>(apiRoutes.acceptRide(this.baseUrl, rideId), body);
   }
+
+  cancelRide(rideId: string): Observable<RideDto> {
+    return this.http.post<RideDto>(apiRoutes.cancelRide(this.baseUrl, rideId), null);
+  }
 }

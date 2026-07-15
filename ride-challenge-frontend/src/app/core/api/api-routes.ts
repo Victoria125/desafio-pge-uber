@@ -15,4 +15,6 @@ export const apiRoutes = {
     `${rideByIdRoute(baseUrl, rideId)}/status`,
   acceptRide: (baseUrl: string, rideId: string): string =>
     `${rideByIdRoute(baseUrl, rideId)}/accept`,
+  cancelRide: (baseUrl: string, rideId: string): string =>
+    `${rideByIdRoute(baseUrl, rideId)}/cancel`,
 } as const;

@@ -14,8 +14,6 @@ function createAccount(type: 'CLIENT' | 'DRIVER', name: string, email: string): 
   cy.contains('button', profileLabel).click();
   cy.contains('button', 'Criar conta').click();
 
-  // espera o dialog abrir e o autofocus do PrimeNG assentar antes de digitar,
-  // senao o foco muda no meio da digitacao e os caracteres vao para outro campo
   cy.get('#account-name').should('be.visible');
   cy.wait(500);
   cy.get('#account-name').type(name).should('have.value', name);
@@ -36,7 +34,7 @@ function createAccount(type: 'CLIENT' | 'DRIVER', name: string, email: string): 
       cy.contains('button', 'Nova corrida').click();
       cy.get('#start-address').type(startAddress);
       cy.get('#destination-address').type(destinationAddress);
-      cy.contains('button', 'Criar').click();
+      cy.contains('button', 'Salvar').click();
 
       cy.contains(startAddress).should('be.visible');
     });
@@ -46,9 +44,9 @@ function createAccount(type: 'CLIENT' | 'DRIVER', name: string, email: string): 
 
       cy.url().should('include', '/driver/rides/available');
 
-      cy.contains('tr', startAddress).contains('button', 'Aceitar').click();
+      cy.contains('article', startAddress).contains('button', 'Aceitar').click();
 
-      cy.contains(startAddress).should('not.exist');
+      cy.contains('article', startAddress).contains('Em andamento').should('be.visible');
     });
 
     it('nao autentica com senha errada', () => {

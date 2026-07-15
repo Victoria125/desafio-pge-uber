@@ -19,18 +19,12 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should render title', async () => {
+  it('should render the router outlet host without the legacy shell', async () => {
     const fixture = TestBed.createComponent(App);
-    await fixture.whenStable();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Desafio de Corridas');
-  });
-
-  it('should not render the account sidebar when no account is selected', async () => {
-    const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('.shell-sidebar')).toBeNull();
-    expect(compiled.textContent).not.toContain('Nenhuma conta selecionada');
+    expect(compiled.querySelector('.shell-header')).toBeNull();
   });
 });

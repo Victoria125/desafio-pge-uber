@@ -1,59 +1,234 @@
-<div class="rides-page">
-  <app-page-header title="Corridas disponíveis" [subtitle]="account()?.name ?? null">
-    <p-button
-      label="Atualizar"
-      icon="pi pi-refresh"
-      severity="secondary"
-      [outlined]="true"
-      [loading]="loading()"
-      (onClick)="loadRides()"
-    />
-  </app-page-header>
+<div class="driver-shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark"><i class="pi pi-car"></i></span>
+      <span class="brand-name">Ride <em>Challenge</em></span>
+    </div>
 
-  <p-table
-    [value]="availableRides()"
-    [loading]="loading()"
-    [tableStyle]="{ 'min-width': '50rem' }"
-    class="p-datatable-sm app-table"
-    [rowTrackBy]="trackById"
-  >
-    <ng-template pTemplate="header">
-      <tr>
-        <th>Corrida</th>
-        <th>Origem</th>
-        <th>Destino</th>
-        <th>Status</th>
-        <th>Criada em</th>
-        <th style="width: 10rem">Ações</th>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-ride>
-      <tr>
-        <td class="id-cell">{{ shortId(ride.id) }}</td>
-        <td>{{ ride.startAddress }}</td>
-        <td>{{ ride.destinationAddress }}</td>
-        <td>
-          <app-ride-status-tag [status]="ride.status" perspective="driver" />
-        </td>
-        <td>{{ ride.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
-        <td>
-          <div class="table-actions">
-            <p-button
-              label="Aceitar"
-              size="small"
-              icon="pi pi-check"
-              [loading]="acceptingRideId() === ride.id"
-              [disabled]="acceptingRideId() !== null && acceptingRideId() !== ride.id"
-              (onClick)="acceptRide(ride)"
-            />
+    <nav class="sidebar-nav" aria-label="Menu do motorista">
+      <button
+        type="button"
+        class="nav-item"
+        [class.is-active]="view() === 'rides'"
+        (click)="changeView('rides')"
+      >
+        <i class="pi pi-car"></i>
+        <span>Corridas</span>
+      </button>
+      <button
+        type="button"
+        class="nav-item"
+        [class.is-active]="view() === 'history'"
+        (click)="changeView('history')"
+      >
+        <i class="pi pi-history"></i>
+        <span>Historico</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      @if (account(); as driver) {
+        <div class="profile-chip">
+          <span class="avatar">{{ initials() }}</span>
+          <div class="profile-chip-text">
+            <strong>{{ driver.name }}</strong>
+            <small>{{ driver.email }}</small>
+            <small>Motorista</small>
           </div>
-        </td>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="emptymessage">
-      <tr>
-        <td colspan="6" class="empty-message">Nenhuma corrida disponível no momento.</td>
-      </tr>
-    </ng-template>
-  </p-table>
+        </div>
+      }
+
+      <button type="button" class="nav-item logout" (click)="logout()">
+        <i class="pi pi-sign-out"></i>
+        <span>Sair</span>
+      </button>
+    </div>
+  </aside>
+
+  <div class="driver-main">
+    <header class="topbar">
+      <h1 class="topbar-title">
+        @switch (view()) {
+          @case ('rides') { Painel de Corridas }
+          @case ('history') { Historico }
+        }
+      </h1>
+
+      <div class="topbar-actions">
+        <div class="bell-wrap">
+          <button
+            type="button"
+            class="bell"
+            aria-label="Notificacoes"
+            (click)="toggleNotices()"
+          >
+            <i class="pi pi-bell"></i>
+            @if (unreadCount() > 0) {
+              <span class="bell-badge">{{ unreadCount() }}</span>
+            }
+          </button>
+
+          @if (noticesOpen()) {
+            <div class="notices-panel">
+              <div class="notices-header">Notificacoes</div>
+              @if (notices().length === 0) {
+                <p class="notices-empty">Nenhuma notificacao por enquanto.</p>
+              } @else {
+                <ul class="notices-list">
+                  @for (notice of notices(); track notice.at) {
+                    <li class="notice" [class]="'notice-' + notice.kind">
+                      <i [class]="noticeIcon(notice.kind)"></i>
+                      <div class="notice-body">
+                        <strong>{{ noticeTitle(notice.kind) }}</strong>
+                        <span>{{ notice.startAddress }} -> {{ notice.destinationAddress }}</span>
+                        <small>{{ relativeTime(notice.at) }}</small>
+                      </div>
+                    </li>
+                  }
+                </ul>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="settings-wrap">
+          <button
+            type="button"
+            class="settings-toggle"
+            aria-label="Configuracoes"
+            (click)="toggleProfileMenu()"
+          >
+            <i class="pi pi-cog"></i>
+          </button>
+
+          @if (profileMenuOpen()) {
+            @if (account(); as driver) {
+              <div class="settings-panel">
+                <span class="avatar avatar-lg">{{ initials() }}</span>
+                <strong>{{ driver.name }}</strong>
+                <span>{{ driver.email }}</span>
+                <small>Motorista</small>
+                <button type="button" class="settings-logout" (click)="logout()">
+                  <i class="pi pi-sign-out"></i>
+                  <span>Sair</span>
+                </button>
+              </div>
+            }
+          }
+        </div>
+      </div>
+    </header>
+
+    <div class="driver-content">
+      @switch (view()) {
+        @case ('rides') {
+          <section class="map-placeholder" aria-hidden="true">
+            <div class="map-pin"><i class="pi pi-map-marker"></i></div>
+            <i class="pi pi-car map-car car-1"></i>
+            <i class="pi pi-car map-car car-2"></i>
+            <i class="pi pi-car map-car car-3"></i>
+          </section>
+
+          <section class="rides-panel">
+            <header class="rides-panel-header">
+              <h2>Painel de corridas</h2>
+            </header>
+
+            <div class="rides-panel-body">
+              @if (panelRides().length === 0 && !loading()) {
+                <p class="rides-empty">Nenhuma corrida no painel no momento.</p>
+              }
+
+              @for (ride of panelRides(); track ride.id) {
+                <article class="ride-card">
+                  <div class="ride-route">
+                    <div class="route-row">
+                      <span class="route-dot origin"></span>
+                      <span class="route-address">{{ ride.startAddress }}</span>
+                      @if (isNewRide(ride)) {
+                        <span class="tag-nova">Nova</span>
+                      }
+                    </div>
+                    <div class="route-row">
+                      <i class="pi pi-map-marker route-pin"></i>
+                      <span class="route-address">{{ ride.destinationAddress }}</span>
+                    </div>
+                  </div>
+
+                  <div class="ride-meta">
+                    <span><i class="pi pi-user"></i> {{ passengerName(ride.userId) }}</span>
+                    <span><i class="pi pi-clock"></i> {{ relativeTime(ride.createdAt) }}</span>
+                    <app-ride-status-tag [status]="ride.status" perspective="driver" />
+                  </div>
+
+                  @if (canAcceptRide(ride)) {
+                    <div class="ride-actions">
+                      <p-button
+                        label="Nao aceitar"
+                        size="small"
+                        severity="secondary"
+                        [outlined]="true"
+                        [disabled]="acceptingRideId() !== null"
+                        (onClick)="declineRide(ride)"
+                      />
+                      <p-button
+                        label="Aceitar corrida"
+                        size="small"
+                        [loading]="acceptingRideId() === ride.id"
+                        [disabled]="acceptingRideId() !== null && acceptingRideId() !== ride.id"
+                        (onClick)="acceptRide(ride)"
+                      />
+                    </div>
+                  }
+                </article>
+              }
+            </div>
+
+            <footer class="rides-panel-footer">
+              <span>
+                @if (updatedAt(); as lastUpdate) {
+                  Atualizado: {{ relativeTime(lastUpdate) === 'Agora' ? 'agora ha pouco' : 'ha ' + relativeTime(lastUpdate) }}
+                }
+              </span>
+              <p-button
+                label="Atualizar"
+                icon="pi pi-refresh"
+                severity="secondary"
+                [text]="true"
+                size="small"
+                [loading]="loading()"
+                (onClick)="loadRides()"
+              />
+            </footer>
+          </section>
+        }
+
+        @case ('history') {
+          <section class="history-panel">
+            @if (myRides().length === 0) {
+              <p class="rides-empty">Voce ainda nao aceitou nenhuma corrida.</p>
+            }
+            @for (ride of myRides(); track ride.id) {
+              <article class="ride-card history-card">
+                <div class="ride-route">
+                  <div class="route-row">
+                    <span class="route-dot origin"></span>
+                    <span class="route-address">{{ ride.startAddress }}</span>
+                  </div>
+                  <div class="route-row">
+                    <i class="pi pi-map-marker route-pin"></i>
+                    <span class="route-address">{{ ride.destinationAddress }}</span>
+                  </div>
+                </div>
+                <div class="ride-meta">
+                  <span><i class="pi pi-user"></i> {{ passengerName(ride.userId) }}</span>
+                  <app-ride-status-tag [status]="ride.status" perspective="driver" />
+                </div>
+              </article>
+            }
+          </section>
+        }
+      }
+    </div>
+  </div>
 </div>

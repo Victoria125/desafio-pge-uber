@@ -47,6 +47,14 @@ public interface RideAPI {
             @RequestHeader(name = USER_TYPE_HEADER) String authenticatedUserType,
             @Valid @RequestBody AcceptRideRequest aRequest);
 
+    @PostMapping(
+            value = "/{id}/cancel",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<RideResponse> cancelRide(
+            @PathVariable(name = "id") String id,
+            @RequestHeader(name = USER_ID_HEADER) String authenticatedUserId,
+            @RequestHeader(name = USER_TYPE_HEADER) String authenticatedUserType);
+
     @GetMapping(
             value = "/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)

@@ -2,6 +2,8 @@ package com.vitoria.rideservice.infrastructure.configuration.beans.ride;
 
 import com.vitoria.rideservice.application.usecase.ride.accept.AcceptRideUseCase;
 import com.vitoria.rideservice.application.usecase.ride.accept.DefaultAcceptRideUseCase;
+import com.vitoria.rideservice.application.usecase.ride.cancel.CancelRideUseCase;
+import com.vitoria.rideservice.application.usecase.ride.cancel.DefaultCancelRideUseCase;
 import com.vitoria.rideservice.application.usecase.ride.changestatus.ChangeStatusRideUseCase;
 import com.vitoria.rideservice.application.usecase.ride.changestatus.DefaultChangeStatusRideUseCase;
 import com.vitoria.rideservice.application.usecase.ride.create.CreateRideUseCase;
@@ -62,6 +64,11 @@ public class RideBeansConfig {
     @Bean
     public AcceptRideUseCase acceptRideUseCase() {
         return new DefaultAcceptRideUseCase(rideGateway, accountClient, rideStatusCache, driverNotifier);
+    }
+
+    @Bean
+    public CancelRideUseCase cancelRideUseCase() {
+        return new DefaultCancelRideUseCase(rideGateway, rideStatusCache, driverNotifier);
     }
 
     @Bean

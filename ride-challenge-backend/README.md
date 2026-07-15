@@ -102,6 +102,7 @@ autorizar as operacoes:
 
 - `POST /rides` e `PUT /rides/{id}`: apenas `CLIENT`, e o `userId` do body deve ser o proprio usuario autenticado.
 - `POST /rides/{id}/accept`: apenas `DRIVER`, e o `driverId` do body deve ser o proprio motorista autenticado.
+- `POST /rides/{id}/cancel`: apenas `CLIENT`, e somente o dono da corrida pode cancelar.
 
 Violacoes retornam `403 Forbidden`; requisicoes sem os headers de identidade (fora do gateway) retornam `401 Unauthorized`.
 
@@ -244,6 +245,13 @@ Authorization: Bearer <token>
 }
 ```
 
+Cancelar corrida (sem body; o dono vem do token):
+
+```http
+POST /rides/{id}/cancel
+Authorization: Bearer <token>
+```
+
 ## WebSocket
 
 Endpoint STOMP:
@@ -258,7 +266,7 @@ Tópico usado para notificar motoristas:
 /topic/rides
 ```
 
-Quando uma corrida é criada, o `ride-service` publica uma mensagem no Kafka. O consumer lê a mensagem e notifica os motoristas conectados pelo tópico `/topic/rides`. Quando uma corrida aberta é editada, o mesmo tópico recebe a rota atualizada.
+Quando uma corrida é criada, o `ride-service` publica uma mensagem no Kafka. O consumer lê a mensagem e notifica os motoristas conectados pelo tópico `/topic/rides`. Quando uma corrida aberta é editada ou cancelada pelo passageiro, o mesmo tópico recebe o evento — o frontend do motorista usa isso para atualizar a lista e alimentar o sino de notificações (nova corrida, corrida editada, corrida cancelada).
 
 ## Timeout de corridas
 

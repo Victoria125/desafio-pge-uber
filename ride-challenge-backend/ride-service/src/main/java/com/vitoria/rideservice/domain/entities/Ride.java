@@ -61,6 +61,15 @@ public class Ride {
         return this;
     }
 
+    public Ride cancel() {
+        if (this.status == RideStatus.COMPLETED || this.status == RideStatus.CANCELLED) {
+            throw new IllegalStateException("Ride %s can no longer be cancelled".formatted(this.id));
+        }
+        this.status = RideStatus.CANCELLED;
+        this.updatedAt = Instant.now();
+        return this;
+    }
+
     public Ride changeStatus(final RideStatus aStatus) {
         this.updatedAt = Instant.now();
         this.status = aStatus;

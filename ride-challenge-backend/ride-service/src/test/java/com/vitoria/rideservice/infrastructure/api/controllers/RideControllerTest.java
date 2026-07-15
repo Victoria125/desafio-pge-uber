@@ -2,6 +2,8 @@ package com.vitoria.rideservice.infrastructure.api.controllers;
 
 import com.vitoria.rideservice.application.usecase.ride.accept.AcceptRideCommand;
 import com.vitoria.rideservice.application.usecase.ride.accept.AcceptRideUseCase;
+import com.vitoria.rideservice.application.usecase.ride.cancel.CancelRideCommand;
+import com.vitoria.rideservice.application.usecase.ride.cancel.CancelRideUseCase;
 import com.vitoria.rideservice.application.usecase.ride.create.CreateRideCommand;
 import com.vitoria.rideservice.application.usecase.ride.create.CreateRideOutput;
 import com.vitoria.rideservice.application.usecase.ride.create.CreateRideUseCase;
@@ -41,6 +43,8 @@ class RideControllerTest {
     private UpdateRideUseCase updateRideUseCase;
     @Mock
     private AcceptRideUseCase acceptRideUseCase;
+    @Mock
+    private CancelRideUseCase cancelRideUseCase;
     @Mock
     private GetRideByIdUseCase getRideByIdUseCase;
     @Mock
@@ -130,6 +134,41 @@ class RideControllerTest {
 
         assertEquals("'driverId' must match the authenticated user", exception.getMessage());
         verifyNoInteractions(this.acceptRideUseCase);
+    }
+
+    @Test
+    void givenAClientCancellingItsOwnRide_whenCallsCancelRide_thenDelegatesToUseCase() {
+        final String rideId = UUID.randomUUID().toString();
+        final String userId = UUID.randomUUID().toString();
+        when(this.cancelRideUseCase.execute(any())).thenReturn(new RideOutput(
+                rideId,
+                userId,
+                null,
+                "Rua A, 100",
+                "Av. B, 200",
+                RideStatus.CANCELLED,
+                Instant.now(),
+                Instant.now()
+        ));
+
+        final ResponseEntity<RideResponse> response = this.controller.cancelRide(rideId, userId, "CLIENT");
+
+        assertEquals(RideStatus.CANCELLED, response.getBody().status());
+        final ArgumentCaptor<CancelRideCommand> captor = ArgumentCaptor.forClass(CancelRideCommand.class);
+        verify(this.cancelRideUseCase, times(1)).execute(captor.capture());
+        assertEquals(rideId, captor.getValue().rideId());
+        assertEquals(userId, captor.getValue().userId());
+    }
+
+    @Test
+    void givenADriverIdentity_whenCallsCancelRide_thenThrowsForbidden() {
+        final ForbiddenOperationException exception = assertThrows(
+                ForbiddenOperationException.class,
+                () -> this.controller.cancelRide(
+                        UUID.randomUUID().toString(), UUID.randomUUID().toString(), "DRIVER"));
+
+        assertEquals("Only clients can cancel rides", exception.getMessage());
+        verifyNoInteractions(this.cancelRideUseCase);
     }
 
     private static RideOutput rideOutput(final String rideId, final String driverId) {

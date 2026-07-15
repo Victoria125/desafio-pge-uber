@@ -2,6 +2,8 @@ package com.vitoria.rideservice.infrastructure.api.controllers;
 
 import com.vitoria.rideservice.application.usecase.ride.accept.AcceptRideCommand;
 import com.vitoria.rideservice.application.usecase.ride.accept.AcceptRideUseCase;
+import com.vitoria.rideservice.application.usecase.ride.cancel.CancelRideCommand;
+import com.vitoria.rideservice.application.usecase.ride.cancel.CancelRideUseCase;
 import com.vitoria.rideservice.application.usecase.ride.create.CreateRideCommand;
 import com.vitoria.rideservice.application.usecase.ride.create.CreateRideOutput;
 import com.vitoria.rideservice.application.usecase.ride.create.CreateRideUseCase;
@@ -30,9 +32,13 @@ import java.util.Objects;
 
 @RestController
 public class RideController implements RideAPI {
+    private static final String CLIENT_TYPE = "CLIENT";
+    private static final String DRIVER_TYPE = "DRIVER";
+
     private final CreateRideUseCase createRideUseCase;
     private final UpdateRideUseCase updateRideUseCase;
     private final AcceptRideUseCase acceptRideUseCase;
+    private final CancelRideUseCase cancelRideUseCase;
     private final GetRideByIdUseCase getRideByIdUseCase;
     private final GetRideStatusUseCase getRideStatusUseCase;
     private final ListRidesUseCase listRidesUseCase;
@@ -41,6 +47,7 @@ public class RideController implements RideAPI {
             final CreateRideUseCase createRideUseCase,
             final UpdateRideUseCase updateRideUseCase,
             final AcceptRideUseCase acceptRideUseCase,
+            final CancelRideUseCase cancelRideUseCase,
             final GetRideByIdUseCase getRideByIdUseCase,
             final GetRideStatusUseCase getRideStatusUseCase,
             final ListRidesUseCase listRidesUseCase
@@ -48,6 +55,7 @@ public class RideController implements RideAPI {
         this.createRideUseCase = Objects.requireNonNull(createRideUseCase);
         this.updateRideUseCase = Objects.requireNonNull(updateRideUseCase);
         this.acceptRideUseCase = Objects.requireNonNull(acceptRideUseCase);
+        this.cancelRideUseCase = Objects.requireNonNull(cancelRideUseCase);
         this.getRideByIdUseCase = Objects.requireNonNull(getRideByIdUseCase);
         this.getRideStatusUseCase = Objects.requireNonNull(getRideStatusUseCase);
         this.listRidesUseCase = Objects.requireNonNull(listRidesUseCase);
@@ -59,7 +67,7 @@ public class RideController implements RideAPI {
             final String authenticatedUserType,
             final CreateRideRequest aRequest
     ) {
-        requireType(authenticatedUserType, "CLIENT", "Only clients can create rides");
+        requireType(authenticatedUserType, CLIENT_TYPE, "Only clients can create rides");
         requireSameIdentity(authenticatedUserId, aRequest.userId(), "'userId' must match the authenticated user");
 
         final CreateRideCommand aCommand = new CreateRideCommand(
@@ -80,7 +88,7 @@ public class RideController implements RideAPI {
             final String authenticatedUserType,
             final UpdateRideRequest aRequest
     ) {
-        requireType(authenticatedUserType, "CLIENT", "Only clients can update rides");
+        requireType(authenticatedUserType, CLIENT_TYPE, "Only clients can update rides");
         requireSameIdentity(authenticatedUserId, aRequest.userId(), "'userId' must match the authenticated user");
 
         final RideResponse response = RidePresenter.presenterSimple
@@ -100,11 +108,24 @@ public class RideController implements RideAPI {
             final String authenticatedUserType,
             final AcceptRideRequest aRequest
     ) {
-        requireType(authenticatedUserType, "DRIVER", "Only drivers can accept rides");
+        requireType(authenticatedUserType, DRIVER_TYPE, "Only drivers can accept rides");
         requireSameIdentity(authenticatedUserId, aRequest.driverId(), "'driverId' must match the authenticated user");
 
         final RideResponse response = RidePresenter.presenterSimple
                 .apply(this.acceptRideUseCase.execute(new AcceptRideCommand(id, aRequest.driverId())));
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<RideResponse> cancelRide(
+            final String id,
+            final String authenticatedUserId,
+            final String authenticatedUserType
+    ) {
+        requireType(authenticatedUserType, CLIENT_TYPE, "Only clients can cancel rides");
+
+        final RideResponse response = RidePresenter.presenterSimple
+                .apply(this.cancelRideUseCase.execute(new CancelRideCommand(id, authenticatedUserId)));
         return ResponseEntity.ok(response);
     }
 

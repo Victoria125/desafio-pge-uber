@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormGroup } from '@angular/forms';
+import { provideRouter } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { providePrimeNG } from 'primeng/config';
 import { of, throwError } from 'rxjs';
@@ -49,6 +50,7 @@ interface ClientComponentInternals {
   startEditingRide(ride: RideDto): void;
   saveEditingRide(ride: RideDto): void;
   canEditRide(ride: RideDto): boolean;
+  cancelRide(ride: RideDto): void;
 }
 
 describe('ClientRidesComponent', () => {
@@ -68,7 +70,20 @@ describe('ClientRidesComponent', () => {
       'listRides',
       'createRide',
       'updateRide',
+      'cancelRide',
     ]);
+    rideService.cancelRide.and.returnValue(
+      of({
+        id: 'ride-1',
+        userId: 'client-1',
+        driverId: null,
+        startAddress: 'Unifor',
+        destinationAddress: 'Praia de Iracema',
+        status: 'CANCELLED',
+        createdAt: '2026-07-09T10:00:00Z',
+        updatedAt: '2026-07-09T10:10:00Z',
+      })
+    );
     rideService.listRides.and.returnValue(of(rides));
     rideService.createRide.and.returnValue(of({ id: 'ride-new' }));
     rideService.updateRide.and.returnValue(
@@ -85,6 +100,7 @@ describe('ClientRidesComponent', () => {
       providers: [
         MessageService,
         providePrimeNG(),
+        provideRouter([]),
         { provide: RideService, useValue: rideService },
       ],
     }).compileComponents();
@@ -204,6 +220,31 @@ describe('ClientRidesComponent', () => {
     expect(destinationInput).not.toBeNull();
     expect(startInput?.value).toBe('Unifor');
     expect(destinationInput?.value).toBe('Praia de Iracema');
+  });
+
+  it('should cancel an open ride and update its status in the list', () => {
+    const component = fixture.componentInstance as unknown as ClientComponentInternals;
+
+    component.cancelRide(rides[0]);
+
+    expect(rideService.cancelRide).toHaveBeenCalledWith('ride-1');
+  });
+
+  it('should not cancel rides that are already finished', () => {
+    const component = fixture.componentInstance as unknown as ClientComponentInternals;
+    const finishedRide: RideDto = {
+      id: 'ride-1',
+      userId: 'client-1',
+      driverId: null,
+      startAddress: 'Unifor',
+      destinationAddress: 'Praia de Iracema',
+      status: 'CANCELLED',
+      createdAt: '2026-07-09T10:00:00Z',
+    };
+
+    component.cancelRide(finishedRide);
+
+    expect(rideService.cancelRide).not.toHaveBeenCalled();
   });
 
   it('should only allow editing rides that are not finished', () => {

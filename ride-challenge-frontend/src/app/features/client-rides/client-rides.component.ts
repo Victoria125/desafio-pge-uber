@@ -9,11 +9,11 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputText } from 'primeng/inputtext';
-import { TableModule } from 'primeng/table';
 import { finalize } from 'rxjs/operators';
 import type { RideDto, UpdateRideRequestDto } from '../../core/api/api-dtos';
 import { RideService } from '../../core/api/ride.service';
@@ -23,7 +23,6 @@ import {
   shortRideId,
 } from '../../core/rides/ride-view.helpers';
 import { SessionService } from '../../core/session/session.service';
-import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
 import { RideStatusTagComponent } from '../../shared/components/ride-status-tag/ride-status-tag.component';
 
 @Component({
@@ -31,12 +30,10 @@ import { RideStatusTagComponent } from '../../shared/components/ride-status-tag/
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    TableModule,
     Button,
     Dialog,
     InputText,
     DatePipe,
-    PageHeaderComponent,
     RideStatusTagComponent,
   ],
   templateUrl: './client-rides.component.html',
@@ -49,14 +46,17 @@ export class ClientRidesComponent {
   private readonly messageService = inject(MessageService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly fb = inject(FormBuilder);
+  private readonly router = inject(Router);
 
   protected readonly account = this.session.account;
   protected readonly rides = signal<RideDto[]>([]);
   protected readonly loading = signal(false);
   protected readonly createDialogVisible = signal(false);
+  protected readonly profileMenuOpen = signal(false);
   protected readonly creating = signal(false);
   protected readonly editingRideId = signal<string | null>(null);
   protected readonly savingRideId = signal<string | null>(null);
+  protected readonly cancellingRideId = signal<string | null>(null);
   protected readonly driverLabel = rideDriverLabel;
   protected readonly shortId = shortRideId;
   protected readonly trackById = rideTrackById;
@@ -65,6 +65,17 @@ export class ClientRidesComponent {
     const account = this.account();
     if (!account) return [];
     return this.rides().filter((ride) => ride.userId === account.id);
+  });
+
+  protected readonly initials = computed(() => {
+    const account = this.account();
+    if (!account) return '';
+    return account.name
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part.charAt(0).toUpperCase())
+      .join('');
   });
 
   protected readonly createForm = this.fb.nonNullable.group({
@@ -101,6 +112,15 @@ export class ClientRidesComponent {
 
   protected closeCreateDialog(): void {
     this.createDialogVisible.set(false);
+  }
+
+  protected toggleProfileMenu(): void {
+    this.profileMenuOpen.update((open) => !open);
+  }
+
+  protected logout(): void {
+    this.session.logout();
+    this.router.navigate(['/login']);
   }
 
   protected submitCreate(): void {
@@ -140,6 +160,31 @@ export class ClientRidesComponent {
 
   protected canEditRide(ride: RideDto): boolean {
     return ride.status !== 'COMPLETED' && ride.status !== 'CANCELLED';
+  }
+
+  protected cancelRide(ride: RideDto): void {
+    if (!this.canEditRide(ride) || this.cancellingRideId()) return;
+
+    this.cancellingRideId.set(ride.id);
+    this.rideService
+      .cancelRide(ride.id)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.cancellingRideId.set(null))
+      )
+      .subscribe({
+        next: (cancelledRide) => {
+          this.rides.update((current) =>
+            current.map((item) => (item.id === cancelledRide.id ? cancelledRide : item))
+          );
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Corrida cancelada',
+            detail: 'Os motoristas foram avisados do cancelamento.',
+          });
+        },
+        error: () => undefined,
+      });
   }
 
   protected startEditingRide(ride: RideDto): void {

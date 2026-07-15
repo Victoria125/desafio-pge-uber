@@ -1,134 +1,213 @@
-<div class="rides-page">
-  <app-page-header title="Minhas corridas" [subtitle]="account()?.name ?? null">
-    <div class="header-actions">
-      <p-button
-        label="Atualizar"
-        icon="pi pi-refresh"
-        severity="secondary"
-        [outlined]="true"
-        [loading]="loading()"
-        (onClick)="loadRides()"
-      />
-      <p-button label="Nova corrida" icon="pi pi-plus" (onClick)="openCreateDialog()" />
+<div class="client-shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark"><i class="pi pi-car"></i></span>
+      <span class="brand-name">Ride <em>Challenge</em></span>
     </div>
-  </app-page-header>
 
-  <div class="rides-table-wrap">
-    <p-table
-      [value]="myRides()"
-      [loading]="loading()"
-      [tableStyle]="{ 'min-width': '60rem' }"
-      class="p-datatable-sm app-table"
-      [rowTrackBy]="trackById"
-    >
-      <ng-template pTemplate="header">
-        <tr>
-          <th>Corrida</th>
-          <th>Origem</th>
-          <th>Destino</th>
-          <th>Status</th>
-          <th>Motorista</th>
-          <th>Criada em</th>
-          <th class="actions-header">Ações</th>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="body" let-ride>
-        <tr [class.editing-tr]="editingRideId() === ride.id">
-          <td class="id-cell">{{ shortId(ride.id) }}</td>
-          <td>{{ ride.startAddress }}</td>
-          <td>{{ ride.destinationAddress }}</td>
-          <td>
-            <app-ride-status-tag [status]="ride.status" perspective="client" />
-          </td>
-          <td>{{ driverLabel(ride.driverId) }}</td>
-          <td>{{ ride.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
-          <td class="actions-cell">
-            @if (canEditRide(ride)) {
-              <p-button
-                icon="pi pi-pencil"
-                severity="secondary"
-                ariaLabel="Editar corrida"
-                title="Editar"
-                [text]="true"
-                [rounded]="true"
-                [disabled]="savingRideId() === ride.id"
-                (onClick)="startEditingRide(ride)"
-              />
-            } @else {
-              <span class="no-action">Finalizada</span>
+    <nav class="sidebar-nav" aria-label="Menu do passageiro">
+      <button type="button" class="nav-item is-active">
+        <i class="pi pi-list"></i>
+        <span>Minhas corridas</span>
+      </button>
+      <button type="button" class="nav-item" (click)="openCreateDialog()">
+        <i class="pi pi-plus"></i>
+        <span>Nova corrida</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      @if (account(); as client) {
+        <div class="profile-chip">
+          <span class="avatar">{{ initials() }}</span>
+          <div class="profile-chip-text">
+            <strong>{{ client.name }}</strong>
+            <small>{{ client.email }}</small>
+            <small>Passageiro</small>
+          </div>
+        </div>
+      }
+
+      <button type="button" class="nav-item logout" (click)="logout()">
+        <i class="pi pi-sign-out"></i>
+        <span>Sair</span>
+      </button>
+    </div>
+  </aside>
+
+  <div class="client-main">
+    <header class="topbar">
+      <h1 class="topbar-title">Minhas corridas</h1>
+
+      <div class="topbar-actions">
+        <p-button
+          label="Atualizar"
+          icon="pi pi-refresh"
+          severity="secondary"
+          [outlined]="true"
+          [loading]="loading()"
+          (onClick)="loadRides()"
+        />
+        <p-button label="Nova corrida" icon="pi pi-plus" (onClick)="openCreateDialog()" />
+
+        <div class="settings-wrap">
+          <button
+            type="button"
+            class="settings-toggle"
+            aria-label="Configuracoes"
+            (click)="toggleProfileMenu()"
+          >
+            <i class="pi pi-cog"></i>
+          </button>
+
+          @if (profileMenuOpen()) {
+            @if (account(); as client) {
+              <div class="settings-panel">
+                <span class="avatar avatar-lg">{{ initials() }}</span>
+                <strong>{{ client.name }}</strong>
+                <span>{{ client.email }}</span>
+                <small>Passageiro</small>
+                <button type="button" class="settings-logout" (click)="logout()">
+                  <i class="pi pi-sign-out"></i>
+                  <span>Sair</span>
+                </button>
+              </div>
             }
-          </td>
-        </tr>
-        @if (editingRideId() === ride.id) {
-          <tr class="expanded-edit-tr">
-            <td colspan="7">
-              <div class="expanded-edit-row-inside" [formGroup]="editForm">
-                <div class="edit-fields">
-                  <label class="edit-label" [for]="'edit-start-' + ride.id">
-                    <span>Origem</span>
-                    <input
-                      [id]="'edit-start-' + ride.id"
-                      type="text"
-                      pInputText
-                      formControlName="startAddress"
-                      class="edit-input"
-                      placeholder="Origem da corrida"
-                    />
-                  </label>
-                  <div class="field-validation">
-                    @if (editForm.controls.startAddress.touched && editForm.controls.startAddress.errors) {
-                      <small class="p-error">Informe a origem.</small>
-                    }
-                  </div>
+          }
+        </div>
+      </div>
+    </header>
+
+    <main class="client-content">
+      <section class="rides-panel">
+        <header class="rides-panel-header">
+          <div>
+            <h2>Corridas</h2>
+            <p>{{ account()?.name }}</p>
+          </div>
+        </header>
+
+        <div class="rides-panel-body">
+          @if (loading()) {
+            <p class="rides-empty">Carregando corridas...</p>
+          } @else if (myRides().length === 0) {
+            <p class="rides-empty">Nenhuma corrida encontrada.</p>
+          }
+
+          @for (ride of myRides(); track ride.id) {
+            <article class="ride-card" [class.editing-card]="editingRideId() === ride.id">
+              <div class="ride-route">
+                <div class="route-row">
+                  <span class="route-dot origin"></span>
+                  <span class="route-address">{{ ride.startAddress }}</span>
                 </div>
-                <div class="edit-fields">
-                  <label class="edit-label" [for]="'edit-destination-' + ride.id">
-                    <span>Destino</span>
-                    <input
-                      [id]="'edit-destination-' + ride.id"
-                      type="text"
-                      pInputText
-                      formControlName="destinationAddress"
-                      class="edit-input"
-                      placeholder="Destino da corrida"
-                    />
-                  </label>
-                  <div class="field-validation">
-                    @if (
-                      editForm.controls.destinationAddress.touched &&
-                      editForm.controls.destinationAddress.errors
-                    ) {
-                      <small class="p-error">Informe o destino.</small>
-                    }
-                  </div>
-                </div>
-                <div class="expanded-edit-row-inside expanded-actions-row">
-                  <p-button
-                    label="Confirmar"
-                    icon="pi pi-check"
-                    [loading]="savingRideId() === ride.id"
-                    [disabled]="editForm.invalid"
-                    (onClick)="saveEditingRide(ride)"
-                  />
-                  <p-button
-                    label="Cancelar"
-                    severity="secondary"
-                    [outlined]="true"
-                    [disabled]="savingRideId() === ride.id"
-                    (onClick)="cancelEditingRide()"
-                  />
+                <div class="route-row">
+                  <i class="pi pi-map-marker route-pin"></i>
+                  <span class="route-address">{{ ride.destinationAddress }}</span>
                 </div>
               </div>
-            </td>
-          </tr>
-        }
-      </ng-template>
-      <ng-template pTemplate="emptymessage">
-        <tr>
-          <td colspan="7" class="empty-message">Nenhuma corrida encontrada.</td>
-        </tr>
-      </ng-template>
-    </p-table>
+
+              <div class="ride-meta">
+                <span class="id-cell">{{ shortId(ride.id) }}</span>
+                <span><i class="pi pi-car"></i> {{ driverLabel(ride.driverId) }}</span>
+                <span><i class="pi pi-clock"></i> {{ ride.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+                <app-ride-status-tag [status]="ride.status" perspective="client" />
+              </div>
+
+              @if (editingRideId() === ride.id) {
+                <div class="expanded-edit-row-inside" [formGroup]="editForm">
+                  <div class="edit-fields">
+                    <label class="edit-label" [for]="'edit-start-' + ride.id">
+                      <span>Origem</span>
+                      <input
+                        [id]="'edit-start-' + ride.id"
+                        type="text"
+                        pInputText
+                        formControlName="startAddress"
+                        class="edit-input"
+                        placeholder="Origem da corrida"
+                      />
+                    </label>
+                    <div class="field-validation">
+                      @if (editForm.controls.startAddress.touched && editForm.controls.startAddress.errors) {
+                        <small class="p-error">Informe a origem.</small>
+                      }
+                    </div>
+                  </div>
+
+                  <div class="edit-fields">
+                    <label class="edit-label" [for]="'edit-destination-' + ride.id">
+                      <span>Destino</span>
+                      <input
+                        [id]="'edit-destination-' + ride.id"
+                        type="text"
+                        pInputText
+                        formControlName="destinationAddress"
+                        class="edit-input"
+                        placeholder="Destino da corrida"
+                      />
+                    </label>
+                    <div class="field-validation">
+                      @if (
+                        editForm.controls.destinationAddress.touched &&
+                        editForm.controls.destinationAddress.errors
+                      ) {
+                        <small class="p-error">Informe o destino.</small>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+
+              <div class="ride-actions">
+                @if (canEditRide(ride)) {
+                  @if (editingRideId() === ride.id) {
+                    <p-button
+                      label="Confirmar"
+                      icon="pi pi-check"
+                      [loading]="savingRideId() === ride.id"
+                      [disabled]="editForm.invalid"
+                      (onClick)="saveEditingRide(ride)"
+                    />
+                    <p-button
+                      label="Cancelar"
+                      severity="secondary"
+                      [outlined]="true"
+                      [disabled]="savingRideId() === ride.id"
+                      (onClick)="cancelEditingRide()"
+                    />
+                  } @else {
+                    <p-button
+                      icon="pi pi-pencil"
+                      severity="secondary"
+                      ariaLabel="Editar corrida"
+                      title="Editar"
+                      [text]="true"
+                      [rounded]="true"
+                      [disabled]="savingRideId() === ride.id || cancellingRideId() === ride.id"
+                      (onClick)="startEditingRide(ride)"
+                    />
+                    <p-button
+                      icon="pi pi-times"
+                      severity="danger"
+                      ariaLabel="Cancelar corrida"
+                      title="Cancelar corrida"
+                      [text]="true"
+                      [rounded]="true"
+                      [loading]="cancellingRideId() === ride.id"
+                      [disabled]="savingRideId() === ride.id"
+                      (onClick)="cancelRide(ride)"
+                    />
+                  }
+                } @else {
+                  <span class="no-action">Finalizada</span>
+                }
+              </div>
+            </article>
+          }
+        </div>
+      </section>
+    </main>
   </div>
 
   <p-dialog
@@ -179,22 +258,23 @@
           }
         </div>
       </div>
-    </form>
 
-    <ng-template pTemplate="footer">
-      <p-button
-        label="Cancelar"
-        severity="secondary"
-        (onClick)="closeCreateDialog()"
-        [disabled]="creating()"
-      />
-      <p-button
-        label="Criar"
-        icon="pi pi-send"
-        (onClick)="submitCreate()"
-        [loading]="creating()"
-        [disabled]="createForm.invalid"
-      />
-    </ng-template>
+      <div class="dialog-actions">
+        <p-button
+          label="Cancelar"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="closeCreateDialog()"
+          [disabled]="creating()"
+        />
+        <p-button
+          label="Salvar"
+          icon="pi pi-check"
+          (onClick)="submitCreate()"
+          [loading]="creating()"
+          [disabled]="createForm.invalid"
+        />
+      </div>
+    </form>
   </p-dialog>
 </div>
